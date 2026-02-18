@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rivnitz App — Brand Wireframes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal:        #1B6B6B;
+    --teal-dark:   #144F4F;
+    --teal-light:  #2A8A8A;
+    --teal-pale:   #E8F4F4;
+    --gold:        #D4933A;
+    --gold-light:  #E8A94A;
+    --gold-pale:   #FDF3E3;
+    --cream:       #F5EFE6;
+    --cream-dark:  #EDE5D8;
+    --white:       #FFFFFF;
+    --text:        #1A2A2A;
+    --muted:       #8A9A9A;
+    --green-check: #4CAF82;
+    --soft-border: rgba(27,107,107,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #EDE5D8;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+  }
+
+  /* PAGE HEADER */
+  .page-header {
+    background: var(--teal-dark);
+    padding: 44px 40px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(212,147,58,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .page-header-logo {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-bottom: 10px;
+  }
+  .flame { font-size: 36px; }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 44px; font-weight: 700;
+    color: var(--white);
+    letter-spacing: 1px;
+  }
+  .page-header h1 span { color: var(--gold); }
+  .page-header-sub {
+    color: var(--gold-light);
+    font-size: 13px; letter-spacing: 2px;
+    text-transform: uppercase; margin-top: 4px;
+  }
+  .page-header-desc {
+    color: rgba(255,255,255,0.5);
+    font-size: 13px; margin-top: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  /* SCREENS GRID */
+  .screens-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 52px;
+    padding: 60px 80px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .screen-wrap {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 16px;
+  }
+  .screen-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; color: var(--teal-dark);
+    font-weight: 700; letter-spacing: 0.5px;
+    text-align: center;
+  }
+  .screen-sublabel {
+    font-size: 12px; color: var(--muted);
+    text-align: center; margin-top: -10px;
+    letter-spacing: 0.5px;
+  }
+
+  /* PHONE */
+  .phone {
+    width: 320px; height: 650px;
+    background: var(--cream);
+    border-radius: 48px;
+    border: 2px solid rgba(27,107,107,0.2);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.8),
+      0 30px 80px rgba(20,79,79,0.25),
+      0 8px 20px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  .notch {
+    width: 100px; height: 22px;
+    background: var(--cream);
+    border-radius: 0 0 14px 14px;
+    margin: 0 auto; flex-shrink: 0;
+    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.06);
+  }
+
+  .status-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 2px 20px 0; flex-shrink: 0;
+  }
+  .status-time { font-size: 11px; color: var(--teal-dark); font-weight: 600; }
+  .status-icons { font-size: 10px; color: var(--teal-dark); }
+
+  .screen-content {
+    flex: 1; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ===== SHARED COMPONENTS ===== */
+
+  /* App Header */
+  .app-header {
+    background: var(--white);
+    padding: 10px 16px 10px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--soft-border);
+  }
+  .app-logo-wrap { display: flex; align-items: center; gap: 6px; }
+  .app-flame { font-size: 18px; }
+  .app-logo-text { display: flex; flex-direction: column; }
+  .app-logo-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--teal); line-height: 1;
+  }
+  .app-logo-tagline { font-size: 8px; color: var(--gold); letter-spacing: 0.5px; }
+  .header-icons { display: flex; gap: 8px; }
+  .icon-btn {
+    width: 30px; height: 30px;
+    background: var(--teal-pale);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--teal);
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    background: var(--white);
+    border-top: 1px solid var(--soft-border);
+    display: flex; justify-content: space-around;
+    padding: 8px 0 12px; flex-shrink: 0;
+  }
+  .nav-item {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px; font-size: 9px;
+  }
+  .nav-item.active { color: var(--teal); }
+  .nav-item.inactive { color: var(--muted); }
+  .nav-icon { font-size: 18px; }
+  .nav-item.active .nav-dot {
+    width: 4px; height: 4px; background: var(--gold);
+    border-radius: 50%; margin: 0 auto;
+  }
+
+  /* Gold Button */
+  .gold-btn {
+    background: var(--gold);
+    color: var(--white);
+    border-radius: 24px;
+    padding: 9px 18px;
+    font-size: 11px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 5px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Teal Badge */
+  .teal-badge {
+    background: var(--teal-pale);
+    border: 1px solid rgba(27,107,107,0.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 9px; color: var(--teal);
+    display: inline-block;
+  }
+
+  /* ===== SCREEN 1: HOMEPAGE ===== */
+  .filter-tabs {
+    display: flex; gap: 6px;
+    padding: 8px 14px;
+    background: var(--white);
+    overflow-x: auto; flex-shrink: 0;
+    border-bottom: 1px solid var(--soft-border);
+    scrollbar-width: none;
+  }
+  .tab {
+    padding: 4px 11px; border-radius: 20px;
+    font-size: 10px; font-weight: 500; white-space: nowrap;
+  }
+  .tab.active { background: var(--teal); color: var(--white); }
+  .tab.inactive { background: var(--cream-dark); color: var(--muted); }
+
+  .video-feed {
+    flex: 1; overflow-y: auto; background: var(--cream);
+    padding: 12px; display: flex; flex-direction: column; gap: 10px;
+    scrollbar-width: none;
+  }
+
+  .featured-video {
+    border-radius: 14px; overflow: hidden;
+    background: var(--white);
+    box-shadow: 0 2px 12px rgba(27,107,107,0.1);
+    flex-shrink: 0;
+  }
+  .video-thumb {
+    height: 130px;
+    background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 100%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .play-btn {
+    width: 44px; height: 44px; background: var(--gold);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--white);
+    box-shadow: 0 4px 16px rgba(212,147,58,0.5);
+  }
+  .new-badge {
+    position: absolute; top: 8px; left: 8px;
+    background: var(--gold); color: var(--white);
+    font-size: 9px; font-weight: 700;
+    padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px;
+  }
+  .video-duration {
+    position: absolute; bottom: 8px; right: 8px;
+    background: rgba(0,0,0,0.6); color: #fff;
+    font-size: 9px; padding: 2px 6px; border-radius: 4px;
+  }
+  .video-info { padding: 10px 12px; }
+  .video-title { font-size: 12px; color: var(--text); font-weight: 600; margin-bottom: 3px; line-height: 1.4; }
+  .video-meta { font-size: 10px; color: var(--muted); }
+
+  .video-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex-shrink: 0;
+  }
+  .video-card {
+    border-radius: 10px; overflow: hidden; background: var(--white);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .video-card-thumb {
+    height: 65px;
+    background: linear-gradient(135deg, var(--teal-dark), var(--teal-light));
+    display: flex; align-items: center; justify-content: center; position: relative;
+  }
+  .small-play { font-size: 14px; color: rgba(255,255,255,0.8); }
+  .video-card-info { padding: 6px 8px; }
+  .video-card-title { font-size: 10px; color: var(--text); font-weight: 500; line-height: 1.3; }
+  .video-card-time { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+  /* ===== SCREEN 2: AI COACH ===== */
+  .chat-header {
+    background: var(--white);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--soft-border);
+    flex-shrink: 0;
+  }
+  .chat-header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .ai-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--teal), var(--teal-light));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .chat-name { font-size: 13px; color: var(--teal-dark); font-weight: 700; }
+  .chat-status { font-size: 10px; color: var(--green-check); }
+
+  .chat-messages {
+    flex: 1; overflow-y: auto; background: var(--cream);
+    padding: 12px; display: flex; flex-direction: column; gap: 10px;
+    scrollbar-width: none;
+  }
+
+  .msg-ai, .msg-user { display: flex; flex-direction: column; gap: 3px; }
+  .msg-user { align-items: flex-end; }
+  .msg-ai { align-items: flex-start; }
+
+  .bubble {
+    max-width: 82%; padding: 9px 12px;
+    border-radius: 14px; font-size: 11px; line-height: 1.55;
+  }
+  .bubble-ai {
+    background: var(--white); color: var(--text);
+    border: 1px solid var(--soft-border);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .bubble-user {
+    background: var(--teal); color: var(--white);
+    border-bottom-right-radius: 4px;
+  }
+  .bubble-time { font-size: 9px; color: var(--muted); padding: 0 4px; }
+
+  .typing-indicator {
+    display: flex; align-items: center; gap: 4px;
+    background: var(--white); padding: 8px 12px;
+    border-radius: 14px; border-bottom-left-radius: 4px;
+    width: fit-content; border: 1px solid var(--soft-border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .dot {
+    width: 5px; height: 5px; background: var(--gold);
+    border-radius: 50%; animation: bounce 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+  }
+
+  .chat-input-bar {
+    background: var(--white); border-top: 1px solid var(--soft-border);
+    padding: 10px 12px; display: flex; gap: 8px;
+    align-items: center; flex-shrink: 0;
+  }
+  .chat-input {
+    flex: 1; background: var(--cream);
+    border: 1px solid var(--soft-border);
+    border-radius: 20px; padding: 8px 14px;
+    font-size: 11px; color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .send-btn {
+    width: 34px; height: 34px; background: var(--gold);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--white);
+  }
+
+  /* ===== SCREEN 3: COMMUNITY ===== */
+  .community-header {
+    background: var(--white); padding: 12px 16px;
+    border-bottom: 1px solid var(--soft-border); flex-shrink: 0;
+  }
+  .community-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; color: var(--teal-dark); font-weight: 700;
+  }
+  .community-count { font-size: 10px; color: var(--gold); margin-top: 1px; }
+
+  .community-feed {
+    flex: 1; overflow-y: auto; background: var(--cream);
+    padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;
+    scrollbar-width: none;
+  }
+
+  .pinned-post {
+    background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+    border-radius: 12px; padding: 12px 14px;
+  }
+  .pin-label { font-size: 9px; color: var(--gold-light); margin-bottom: 5px; letter-spacing: 0.5px; font-weight: 600; }
+  .pin-text { font-size: 11px; color: rgba(255,255,255,0.92); line-height: 1.55; font-style: italic; }
+  .pin-source { font-size: 9px; color: var(--gold-light); margin-top: 5px; }
+
+  .community-post {
+    background: var(--white); border-radius: 12px; padding: 10px 12px;
+    border: 1px solid var(--soft-border);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  }
+  .post-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .user-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .post-username { font-size: 11px; color: var(--teal-dark); font-weight: 600; }
+  .post-time { font-size: 9px; color: var(--muted); }
+  .post-text { font-size: 11px; color: var(--text); line-height: 1.5; }
+  .post-actions {
+    display: flex; gap: 14px; margin-top: 8px;
+    padding-top: 7px; border-top: 1px solid var(--soft-border);
+  }
+  .post-action { font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 3px; }
+  .post-action.liked { color: var(--gold); }
+
+  .community-input-bar {
+    background: var(--white); border-top: 1px solid var(--soft-border);
+    padding: 10px 12px; display: flex; gap: 8px;
+    align-items: center; flex-shrink: 0;
+  }
+  .community-input {
+    flex: 1; background: var(--cream);
+    border: 1px solid var(--soft-border); border-radius: 20px;
+    padding: 8px 14px; font-size: 11px; color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ===== SCREEN 4: GROWTH TRACKER ===== */
+  .tracker-header {
+    background: var(--teal-dark); padding: 14px 16px; flex-shrink: 0;
+  }
+  .tracker-greeting { font-size: 11px; color: var(--gold-light); margin-bottom: 2px; }
+  .tracker-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; color: var(--white); font-weight: 700;
+  }
+
+  .tracker-body {
+    flex: 1; overflow-y: auto; background: var(--cream);
+    padding: 12px; display: flex; flex-direction: column; gap: 10px;
+    scrollbar-width: none;
+  }
+
+  .motivation-card {
+    background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+    border-radius: 14px; padding: 14px; position: relative; overflow: hidden;
+    flex-shrink: 0;
+  }
+  .motivation-card::after {
+    content: '🔥';
+    position: absolute; right: 12px; top: 10px;
+    font-size: 24px; opacity: 0.2;
+  }
+  .motivation-label { font-size: 9px; color: var(--gold-light); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+  .motivation-text { font-size: 11px; color: rgba(255,255,255,0.92); line-height: 1.6; font-style: italic; }
+  .motivation-source { font-size: 9px; color: var(--gold-light); margin-top: 6px; }
+
+  .streak-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; flex-shrink: 0; }
+  .streak-card {
+    background: var(--white); border-radius: 12px; padding: 10px 8px;
+    text-align: center; border: 1px solid var(--soft-border);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  }
+  .streak-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; font-weight: 700; color: var(--teal);
+  }
+  .streak-label { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+  .progress-section { flex-shrink: 0; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .progress-label { font-size: 11px; color: var(--text); font-weight: 500; }
+  .progress-pct { font-size: 11px; color: var(--teal); font-weight: 700; }
+  .progress-bar-bg {
+    height: 8px; background: var(--cream-dark);
+    border-radius: 4px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--teal-light));
+    border-radius: 4px;
+  }
+
+  .tasks-section { flex-shrink: 0; }
+  .section-title {
+    font-size: 11px; color: var(--teal-dark); text-transform: uppercase;
+    letter-spacing: 1px; font-weight: 700; margin-bottom: 8px;
+  }
+  .task-item {
+    background: var(--white); border-radius: 10px; padding: 9px 12px;
+    display: flex; align-items: center; gap: 10px;
+    border: 1px solid var(--soft-border); margin-bottom: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .task-check {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; flex-shrink: 0;
+  }
+  .task-check.done { background: var(--green-check); color: #fff; }
+  .task-check.todo { border: 2px solid var(--soft-border); }
+  .task-text { flex: 1; font-size: 11px; }
+  .task-text.done-text { color: var(--muted); text-decoration: line-through; }
+  .task-text.todo-text { color: var(--text); }
+  .task-category { font-size: 9px; padding: 2px 7px; border-radius: 8px; font-weight: 500; }
+  .cat-spiritual { background: var(--teal-pale); color: var(--teal); }
+  .cat-health { background: rgba(76,175,130,0.12); color: #2E8B57; }
+  .cat-relation { background: var(--gold-pale); color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-logo">
+    <span class="flame">🔥</span>
+    <h1><span>Rivnitz</span></h1>
+  </div>
+  <div class="page-header-sub">Miracles Through Mission</div>
+  <div class="page-header-desc">App UI Wireframes — Brand Reference Screens</div>
+</div>
+
+<div class="screens-grid">
+
+  <!-- SCREEN 1: HOMEPAGE -->
+  <div class="screen-wrap">
+    <div class="screen-label">01 — Homepage</div>
+    <div class="screen-sublabel">Daily Video Feed & Teachings</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">▲▲▲ WiFi 🔋</span>
+      </div>
+      <div class="screen-content">
+        <div class="app-header">
+          <div class="app-logo-wrap">
+            <span class="app-flame">🔥</span>
+            <div class="app-logo-text">
+              <span class="app-logo-name">Rivnitz</span>
+              <span class="app-logo-tagline">Miracles Through Mission</span>
+            </div>
+          </div>
+          <div class="header-icons">
+            <div class="icon-btn">🔔</div>
+            <div class="icon-btn">☰</div>
+          </div>
+        </div>
+        <div class="filter-tabs">
+          <div class="tab active">All</div>
+          <div class="tab inactive">Marriage</div>
+          <div class="tab inactive">Faith</div>
+          <div class="tab inactive">Parenting</div>
+          <div class="tab inactive">Anger</div>
+        </div>
+        <div class="video-feed">
+          <div class="featured-video">
+            <div class="video-thumb">
+              <div class="new-badge">NEW</div>
+              <div class="play-btn">▶</div>
+              <div class="video-duration">12:44</div>
+            </div>
+            <div class="video-info">
+              <div class="video-title">The Path of Inner Peace — Finding Stillness in Daily Life</div>
+              <div class="video-meta">Rabbi Landau · Today · 2.4K views</div>
+            </div>
+          </div>
+          <div class="video-grid">
+            <div class="video-card">
+              <div class="video-card-thumb">
+                <div class="small-play">▶</div>
+                <div class="video-duration" style="font-size:8px;bottom:4px;right:4px;">8:21</div>
+              </div>
+              <div class="video-card-info">
+                <div class="video-card-title">How to Speak with Your Spouse</div>
+                <div class="video-card-time">3 days ago</div>
+              </div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-thumb">
+                <div class="small-play">▶</div>
+                <div class="video-duration" style="font-size:8px;bottom:4px;right:4px;">22:05</div>
+              </div>
+              <div class="video-card-info">
+                <div class="video-card-title">Overcoming Fear & Doubt</div>
+                <div class="video-card-time">1 week ago</div>
+              </div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-thumb">
+                <div class="small-play">▶</div>
+                <div class="video-duration" style="font-size:8px;bottom:4px;right:4px;">5:14</div>
+              </div>
+              <div class="video-card-info">
+                <div class="video-card-title">Morning Intention Practice</div>
+                <div class="video-card-time">2 weeks ago</div>
+              </div>
+            </div>
+            <div class="video-card">
+              <div class="video-card-thumb">
+                <div class="small-play">▶</div>
+                <div class="video-duration" style="font-size:8px;bottom:4px;right:4px;">18:33</div>
+              </div>
+              <div class="video-card-info">
+                <div class="video-card-title">Raising Children with Purpose</div>
+                <div class="video-card-time">3 weeks ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item active">
+            <div class="nav-icon">🏠</div><span>Home</span>
+            <div class="nav-dot"></div>
+          </div>
+          <div class="nav-item inactive"><div class="nav-icon">🤖</div><span>Coach</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">💬</div><span>Community</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">📈</div><span>Growth</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: AI COACH -->
+  <div class="screen-wrap">
+    <div class="screen-label">02 — AI Personal Coach</div>
+    <div class="screen-sublabel">Personalized Spiritual Coaching Chat</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">▲▲▲ WiFi 🔋</span>
+      </div>
+      <div class="screen-content">
+        <div class="chat-header">
+          <div class="chat-header-top">
+            <div class="ai-avatar">🔥</div>
+            <div style="flex:1">
+              <div class="chat-name">Rivnitz Coach</div>
+              <div class="chat-status">● Online</div>
+            </div>
+            <div class="icon-btn">⋯</div>
+          </div>
+          <div class="teal-badge">Your Type: The Seeker — Driven, Sensitive, Growth-Oriented</div>
+        </div>
+        <div class="chat-messages">
+          <div class="msg-ai">
+            <div class="bubble bubble-ai">Shalom! Based on your nature, I want to share something tailored for you today. How are you feeling this morning?</div>
+            <div class="bubble-time">9:02 AM</div>
+          </div>
+          <div class="msg-user">
+            <div class="bubble bubble-user">I've been having tension with my wife lately. Not sure how to handle it.</div>
+            <div class="bubble-time">9:04 AM</div>
+          </div>
+          <div class="msg-ai">
+            <div class="bubble bubble-ai">I hear you. For someone with your temperament, conflict feels very heavy. The Rebbe teaches that true peace begins with understanding — not with being understood. What do you think she most needs from you right now?</div>
+            <div class="bubble-time">9:04 AM</div>
+          </div>
+          <div class="msg-user">
+            <div class="bubble bubble-user">Probably just to feel heard. I get defensive too fast.</div>
+            <div class="bubble-time">9:06 AM</div>
+          </div>
+          <div class="typing-indicator">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+        </div>
+        <div class="chat-input-bar">
+          <div class="chat-input">Ask anything...</div>
+          <div class="send-btn">➤</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item inactive"><div class="nav-icon">🏠</div><span>Home</span></div>
+          <div class="nav-item active">
+            <div class="nav-icon">🤖</div><span>Coach</span>
+            <div class="nav-dot"></div>
+          </div>
+          <div class="nav-item inactive"><div class="nav-icon">💬</div><span>Community</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">📈</div><span>Growth</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: COMMUNITY -->
+  <div class="screen-wrap">
+    <div class="screen-label">03 — Community</div>
+    <div class="screen-sublabel">Public Forum & Member Chat</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar">
+        <span class="status-time">9:41</span>
+        <span class="status-icons">▲▲▲ WiFi 🔋</span>
+      </div>
+      <div class="screen-content">
+        <div class="community-header">
+          <div class="community-title">Rivnitz Community</div>
+          <div class="community-count">🔥 1,847 members online</div>
+        </div>
+        <div class="community-feed">
+          <div class="pinned-post">
+            <div class="pin-label">📌 PINNED — FROM RABBI LANDAU</div>
+            <div class="pin-text">"This week, focus on one act of kindness each day that no one sees. That is the truest test of character."</div>
+            <div class="pin-source">Rabbi Landau · 2 hours ago</div>
+          </div>
+          <div class="community-post">
+            <div class="post-header">
+              <div class="user-avatar" style="background:var(--teal-pale);color:var(--teal);">YM</div>
+              <div>
+                <div class="post-username">Yosef M.</div>
+                <div class="post-time">35 min ago</div>
+              </div>
+            </div>
+            <div class="post-text">The daily tasks feature completely changed my morning routine. I feel so much more grounded.</div>
+            <div class="post-actions">
+              <div class="post-action liked">♥ 24</div>
+              <div class="post-action">💬 8 replies</div>
+              <div class="post-action">↗ Share</div>
+            </div>
+          </div>
+          <div class="community-post">
+            <div class="post-header">
+              <div class="user-avatar" style="background:var(--gold-pale);color:var(--gold);">RL</div>
+              <div>
+                <div class="post-username">Rivka L.</div>
+                <div class="post-time">1 hr ago</div>
+              </div>
+            </div>
+            <div class="post-text">How do you handle it when you know you're right but it's causing shalom bayis issues?</div>
+            <div class="post-actions">
+              <div class="post-action">♥ 11</div>
+              <div class="post-action">💬 16 replies</div>
+              <div class="post-action">↗ Share</div>
+            </div>
+          </div>
+          <div class="community-post">
+            <div class="post-header">
+              <div class="user-avatar" style="background:rgba(76,175,130,0.12);color:#2E8B57;">DS</div>
+              <div>
+                <div class="post-username">Dovid S.</div>
+                <div class="post-time">2 hrs ago</div>
+              </div>
+            </div>
+            <div class="post-text">Just had my first live consultation with the Rabbi. 5 minutes that changed everything for me. 🙏</div>
+            <div class="post-actions">
+              <div class="post-action liked">♥ 57</div>
+              <div class="post-action">💬 22 replies</div>
+              <div class="post-action">↗ Share</div>
+            </div>
+          </div>
+        </div>
+        <div class="community-input-bar">
+          <div class="community-input">Share with the community...</div>
+          <div class="send-btn">➤</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item inactive"><div class="nav-icon">🏠</div><span>Home</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">🤖</div><span>Coach</span></div>
+          <div class="nav-item active">
+            <div class="nav-icon">💬</div><span>Community</span>
+            <div class="nav-dot"></div>
+          </div>
+          <div class="nav-item inactive"><div class="nav-icon">📈</div><span>Growth</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: GROWTH TRACKER -->
+  <div class="screen-wrap">
+    <div class="screen-label">04 — Daily Growth Tracker</div>
+    <div class="screen-sublabel">Morning Motivation & Task Progress</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar" style="background:var(--teal-dark)">
+        <span class="status-time" style="color:#fff">9:41</span>
+        <span class="status-icons" style="color:#fff">▲▲▲ WiFi 🔋</span>
+      </div>
+      <div class="screen-content">
+        <div class="tracker-header">
+          <div class="tracker-greeting">Good Morning, Moshe 🔥</div>
+          <div class="tracker-title">Your Daily Growth</div>
+        </div>
+        <div class="tracker-body">
+          <div class="motivation-card">
+            <div class="motivation-label">Morning Intention</div>
+            <div class="motivation-text">"Today, let patience be your teacher. Before reacting, take one breath. In that breath lives your freedom."</div>
+            <div class="motivation-source">— Tailored for your journey · Wednesday</div>
+          </div>
+          <div class="streak-row">
+            <div class="streak-card">
+              <div class="streak-num">14</div>
+              <div class="streak-label">Day Streak</div>
+            </div>
+            <div class="streak-card">
+              <div class="streak-num">5</div>
+              <div class="streak-label">Tasks Today</div>
+            </div>
+            <div class="streak-card">
+              <div class="streak-num">3</div>
+              <div class="streak-label">Completed</div>
+            </div>
+          </div>
+          <div class="progress-section">
+            <div class="progress-header">
+              <span class="progress-label">Today's Progress</span>
+              <span class="progress-pct">60%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width:60%"></div>
+            </div>
+          </div>
+          <div class="tasks-section">
+            <div class="section-title">Today's Tasks</div>
+            <div class="task-item">
+              <div class="task-check done">✓</div>
+              <div class="task-text done-text">Morning prayer with full focus</div>
+              <div class="task-category cat-spiritual">Spirit</div>
+            </div>
+            <div class="task-item">
+              <div class="task-check done">✓</div>
+              <div class="task-text done-text">15 min walk outside</div>
+              <div class="task-category cat-health">Health</div>
+            </div>
+            <div class="task-item">
+              <div class="task-check done">✓</div>
+              <div class="task-text done-text">Listen before responding to spouse</div>
+              <div class="task-category cat-relation">Relation</div>
+            </div>
+            <div class="task-item">
+              <div class="task-check todo"></div>
+              <div class="task-text todo-text">Study one teaching from library</div>
+              <div class="task-category cat-spiritual">Spirit</div>
+            </div>
+            <div class="task-item">
+              <div class="task-check todo"></div>
+              <div class="task-text todo-text">One act of kindness — unannounced</div>
+              <div class="task-category cat-relation">Relation</div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item inactive"><div class="nav-icon">🏠</div><span>Home</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">🤖</div><span>Coach</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">💬</div><span>Community</span></div>
+          <div class="nav-item active">
+            <div class="nav-icon">📈</div><span>Growth</span>
+            <div class="nav-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SECTION DIVIDER -->
+<div style="text-align:center;padding:20px 0 0;color:var(--teal-dark);font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:2px;opacity:0.5;">· · · · · · · · · ·</div>
+<div style="text-align:center;padding:8px 0 40px;color:var(--teal-dark);font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;">Additional Screens</div>
+
+<div class="screens-grid" style="grid-template-columns:repeat(3,1fr);gap:36px;padding:0 60px 60px;">
+
+  <!-- SCREEN 5A: LOGIN -->
+  <div class="screen-wrap">
+    <div class="screen-label">05 — Login / Sign Up</div>
+    <div class="screen-sublabel">Simple onboarding entry screen</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">▲▲▲ WiFi 🔋</span></div>
+      <div class="screen-content">
+        <div style="flex:1;overflow-y:auto;background:var(--cream);display:flex;flex-direction:column;scrollbar-width:none;">
+          <!-- Hero -->
+          <div style="background:linear-gradient(160deg,var(--teal-dark) 0%,var(--teal) 100%);padding:36px 24px 28px;text-align:center;flex-shrink:0;">
+            <div style="font-size:36px;margin-bottom:8px;">🔥</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--white);font-weight:700;letter-spacing:1px;">Rivnitz</div>
+            <div style="font-size:11px;color:var(--gold-light);margin-top:3px;letter-spacing:1px;">Miracles Through Mission</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:12px;line-height:1.6;">Join a sacred community of<br/>guidance, healing & blessing</div>
+          </div>
+          <!-- Login options -->
+          <div style="padding:24px 20px;display:flex;flex-direction:column;gap:12px;flex:1;">
+            <!-- Google -->
+            <div style="background:var(--white);border:1px solid var(--soft-border);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+              <div style="width:24px;height:24px;background:#EA4335;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex-shrink:0;font-weight:700;">G</div>
+              <div style="font-size:12px;color:var(--text);font-weight:600;">Continue with Google</div>
+            </div>
+            <!-- Divider -->
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="flex:1;height:1px;background:var(--soft-border);"></div>
+              <div style="font-size:10px;color:var(--muted);">or</div>
+              <div style="flex:1;height:1px;background:var(--soft-border);"></div>
+            </div>
+            <!-- Email -->
+            <div style="background:var(--white);border:1px solid var(--soft-border);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--muted);">Email address</div>
+            <div style="background:var(--white);border:1px solid var(--soft-border);border-radius:10px;padding:10px 14px;font-size:11px;color:var(--muted);">Password</div>
+            <div style="background:var(--teal);border-radius:14px;padding:12px;text-align:center;font-size:12px;font-weight:600;color:var(--white);">Sign In</div>
+            <div style="text-align:center;font-size:11px;color:var(--muted);">Don't have an account? <span style="color:var(--teal);font-weight:600;">Sign Up</span></div>
+            <!-- Profile note -->
+            <div style="background:var(--gold-pale);border:1px solid rgba(212,147,58,0.2);border-radius:10px;padding:10px 12px;text-align:center;margin-top:4px;">
+              <div style="font-size:10px;color:var(--gold);font-weight:600;">♥ Free to join</div>
+              <div style="font-size:9px;color:var(--muted);margin-top:2px;">Basic membership includes daily videos & community</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5B: PROFILE COMPLETION -->
+  <div class="screen-wrap">
+    <div class="screen-label">05b — Complete Your Profile</div>
+    <div class="screen-sublabel">Basic info + prayer details — always encouraged</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">▲▲▲ WiFi 🔋</span></div>
+      <div class="screen-content">
+        <div class="app-header">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--teal-dark);font-weight:700;">My Profile</div>
+          <div style="font-size:11px;color:var(--gold);font-weight:600;">Save</div>
+        </div>
+        <!-- Profile completion banner -->
+        <div style="background:var(--gold);padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+          <div style="font-size:14px;">⚠️</div>
+          <div style="flex:1;">
+            <div style="font-size:11px;color:var(--white);font-weight:600;">Complete your profile — 60%</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.8);">Add missing fields to unlock full features</div>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;background:var(--cream);padding:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none;">
+          <!-- Avatar -->
+          <div style="text-align:center;padding:8px 0;">
+            <div style="width:60px;height:60px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 6px;">👤</div>
+            <div style="font-size:10px;color:var(--teal);font-weight:600;">Add photo</div>
+          </div>
+          <!-- Fields - filled -->
+          <div style="font-size:10px;color:var(--teal-dark);font-weight:700;text-transform:uppercase;letter-spacing:1px;">Basic Info</div>
+          <div style="background:var(--white);border-radius:10px;padding:10px 14px;border:1px solid var(--soft-border);">
+            <div style="font-size:9px;color:var(--muted);margin-bottom:2px;">Full Name</div>
+            <div style="font-size:12px;color:var(--text);">Moshe Goldstein</div>
+          </div>
+          <div style="background:var(--white);border-radius:10px;padding:10px 14px;border:1px solid var(--soft-border);">
+            <div style="font-size:9px;color:var(--muted);margin-bottom:2px;">Email</div>
+            <div style="font-size:12px;color:var(--text);">moshe@email.com</div>
+          </div>
+          <!-- Missing field - phone -->
+          <div style="background:var(--white);border-radius:10px;padding:10px 14px;border:2px dashed rgba(212,147,58,0.4);position:relative;">
+            <div style="font-size:9px;color:var(--gold);margin-bottom:2px;font-weight:600;">📱 Phone Number — Missing</div>
+            <div style="font-size:11px;color:var(--muted);">Tap to add</div>
+          </div>
+          <!-- Prayer fields -->
+          <div style="font-size:10px;color:var(--teal-dark);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">For Prayers 🙏</div>
+          <div style="background:var(--white);border-radius:10px;padding:10px 14px;border:1px solid var(--soft-border);">
+            <div style="font-size:9px;color:var(--muted);margin-bottom:2px;">Hebrew Name</div>
+            <div style="font-size:12px;color:var(--text);">Moshe ben Avraham</div>
+          </div>
+          <!-- Missing - mother's name -->
+          <div style="background:var(--white);border-radius:10px;padding:10px 14px;border:2px dashed rgba(212,147,58,0.4);">
+            <div style="font-size:9px;color:var(--gold);margin-bottom:2px;font-weight:600;">✨ Mother's Name — Missing</div>
+            <div style="font-size:11px;color:var(--muted);">Used for prayers & blessings</div>
+          </div>
+          <div style="background:var(--gold-pale);border-radius:10px;padding:10px 12px;border:1px solid rgba(212,147,58,0.2);">
+            <div style="font-size:10px;color:var(--gold);font-weight:600;">Why we ask for your mother's name</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:3px;line-height:1.5;">In Jewish tradition, prayers are offered using your name and your mother's name. This ensures your tefillos reach exactly where they need to go.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5C: AI CONVERSATIONAL QUIZ -->
+  <div class="screen-wrap">
+    <div class="screen-label">05c — AI Nature Discovery</div>
+    <div class="screen-sublabel">Conversational quiz — MBTI, Enneagram, Human Design</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">▲▲▲ WiFi 🔋</span></div>
+      <div class="screen-content">
+        <!-- Quiz chat header -->
+        <div style="background:var(--teal-dark);padding:12px 16px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="width:34px;height:34px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🔥</div>
+            <div>
+              <div style="font-size:13px;color:var(--white);font-weight:700;">Discover Your Nature</div>
+              <div style="font-size:9px;color:var(--gold-light);">Powered by Rivnitz AI · Takes ~5 min</div>
+            </div>
+          </div>
+          <!-- Progress chips -->
+          <div style="display:flex;gap:5px;">
+            <div style="background:var(--gold);border-radius:20px;padding:3px 9px;font-size:9px;color:var(--white);font-weight:600;">Personality ✓</div>
+            <div style="background:var(--gold);border-radius:20px;padding:3px 9px;font-size:9px;color:var(--white);font-weight:600;">Enneagram ✓</div>
+            <div style="background:rgba(255,255,255,0.2);border-radius:20px;padding:3px 9px;font-size:9px;color:rgba(255,255,255,0.7);">Face Reading</div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:20px;padding:3px 9px;font-size:9px;color:rgba(255,255,255,0.4);">Hand</div>
+          </div>
+        </div>
+        <!-- Conversational chat -->
+        <div style="flex:1;overflow-y:auto;background:var(--cream);padding:12px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none;">
+          <!-- AI message -->
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px;">
+            <div style="max-width:85%;background:var(--white);border-radius:14px;border-bottom-left-radius:4px;padding:10px 12px;border:1px solid var(--soft-border);font-size:11px;color:var(--text);line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              Shalom! I'm going to ask you a few questions to understand your unique nature. There are no right or wrong answers — just be honest. Ready?
+            </div>
+            <div style="font-size:9px;color:var(--muted);padding-left:4px;">Rivnitz AI</div>
+          </div>
+          <!-- User -->
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+            <div style="max-width:75%;background:var(--teal);border-radius:14px;border-bottom-right-radius:4px;padding:10px 12px;font-size:11px;color:var(--white);line-height:1.5;">Yes, ready!</div>
+          </div>
+          <!-- AI follow up -->
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px;">
+            <div style="max-width:88%;background:var(--white);border-radius:14px;border-bottom-left-radius:4px;padding:10px 12px;border:1px solid var(--soft-border);font-size:11px;color:var(--text);line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              When you're in a group and someone is suffering quietly, what do you feel? Do you notice it right away, or do you tend to focus on the task at hand?
+            </div>
+          </div>
+          <!-- User response -->
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+            <div style="max-width:80%;background:var(--teal);border-radius:14px;border-bottom-right-radius:4px;padding:10px 12px;font-size:11px;color:var(--white);line-height:1.5;">I always notice. I feel it before they even say anything.</div>
+          </div>
+          <!-- AI response -->
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px;">
+            <div style="max-width:88%;background:var(--white);border-radius:14px;border-bottom-left-radius:4px;padding:10px 12px;border:1px solid var(--soft-border);font-size:11px;color:var(--text);line-height:1.55;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+              That's a meaningful trait. It tells me something important about your type. One more — when you make a big decision, do you lead with your heart or do you need to think it through logically first?
+            </div>
+          </div>
+          <!-- Face reading prompt card -->
+          <div style="background:var(--gold-pale);border:1px solid rgba(212,147,58,0.25);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+            <div style="font-size:22px;">📷</div>
+            <div style="flex:1;">
+              <div style="font-size:11px;color:var(--teal-dark);font-weight:600;">Coming up: Face Reading</div>
+              <div style="font-size:9px;color:var(--muted);margin-top:2px;">A quick photo helps refine your nature profile</div>
+            </div>
+          </div>
+        </div>
+        <!-- Input bar -->
+        <div style="background:var(--white);border-top:1px solid var(--soft-border);padding:10px 12px;display:flex;gap:8px;align-items:center;flex-shrink:0;">
+          <div style="flex:1;background:var(--cream);border:1px solid var(--soft-border);border-radius:20px;padding:8px 14px;font-size:11px;color:var(--muted);">Type your answer...</div>
+          <div style="width:34px;height:34px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--white);">➤</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: PRAYER & CANDLE LIGHTING -->
+  <div class="screen-wrap">
+    <div class="screen-label">06 — Prayer & Blessings</div>
+    <div class="screen-sublabel">Candle Lighting, Yeshua & Prayer Requests</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">▲▲▲ WiFi 🔋</span></div>
+      <div class="screen-content">
+        <div class="app-header">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:13px;color:var(--muted);">←</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--teal-dark);font-weight:700;">Sacred Requests</div>
+          </div>
+          <div class="icon-btn">🔔</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;background:var(--cream);padding:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none;">
+          <!-- Intro -->
+          <div style="background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:14px;padding:14px;text-align:center;">
+            <div style="font-size:24px;margin-bottom:6px;">🕯️</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--white);font-weight:700;margin-bottom:4px;">Prayers at the Holy Tziyun</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.75);line-height:1.5;">Rabbi Landau prays at the Ribnitzer Rebbe's tziyun on your behalf</div>
+          </div>
+          <!-- Service Cards -->
+          <div style="background:var(--white);border-radius:12px;padding:12px;border:1px solid var(--soft-border);display:flex;gap:12px;align-items:center;">
+            <div style="width:42px;height:42px;background:var(--gold-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🕯️</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;color:var(--teal-dark);font-weight:600;">Light a Candle</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;">In honor or memory of a loved one</div>
+            </div>
+            <div style="background:var(--gold);color:var(--white);border-radius:20px;padding:5px 12px;font-size:10px;font-weight:600;">Donate</div>
+          </div>
+          <div style="background:var(--white);border-radius:12px;padding:12px;border:1px solid var(--soft-border);display:flex;gap:12px;align-items:center;">
+            <div style="width:42px;height:42px;background:var(--teal-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🙏</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;color:var(--teal-dark);font-weight:600;">Submit Prayer Request</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;">A name to be prayed for at the tziyun</div>
+            </div>
+            <div style="background:var(--gold);color:var(--white);border-radius:20px;padding:5px 12px;font-size:10px;font-weight:600;">Donate</div>
+          </div>
+          <div style="background:var(--white);border-radius:12px;padding:12px;border:1px solid var(--soft-border);display:flex;gap:12px;align-items:center;">
+            <div style="width:42px;height:42px;background:rgba(212,147,58,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">✨</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;color:var(--teal-dark);font-weight:600;">Request a Yeshua</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;">For a miracle or salvation in your life</div>
+            </div>
+            <div style="background:var(--gold);color:var(--white);border-radius:20px;padding:5px 12px;font-size:10px;font-weight:600;">Donate</div>
+          </div>
+          <div style="background:var(--white);border-radius:12px;padding:12px;border:1px solid var(--soft-border);display:flex;gap:12px;align-items:center;">
+            <div style="width:42px;height:42px;background:var(--teal-pale);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">💚</div>
+            <div style="flex:1;">
+              <div style="font-size:12px;color:var(--teal-dark);font-weight:600;">Personal Blessing</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px;">Request a blessing for yourself or family</div>
+            </div>
+            <div style="background:var(--gold);color:var(--white);border-radius:20px;padding:5px 12px;font-size:10px;font-weight:600;">Donate</div>
+          </div>
+          <!-- Donation note -->
+          <div style="background:var(--gold-pale);border-radius:10px;padding:10px 12px;border:1px solid rgba(212,147,58,0.2);text-align:center;">
+            <div style="font-size:10px;color:var(--gold);font-weight:600;">♥ All requests are donation-based</div>
+            <div style="font-size:9px;color:var(--muted);margin-top:2px;">Give what your heart calls you to give</div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item inactive"><div class="nav-icon">🏠</div><span>Home</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">🤖</div><span>Coach</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">💬</div><span>Community</span></div>
+          <div class="nav-item inactive"><div class="nav-icon">📈</div><span>Growth</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 7: RABBI LIVE SESSION -->
+  <div class="screen-wrap">
+    <div class="screen-label">07 — Rabbi Live Session</div>
+    <div class="screen-sublabel">Private Consultation Waiting Room</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar" style="background:var(--teal-dark);"><span class="status-time" style="color:#fff;">9:41</span><span class="status-icons" style="color:#fff;">▲▲▲ WiFi 🔋</span></div>
+      <div class="screen-content">
+        <!-- Live Header -->
+        <div style="background:var(--teal-dark);padding:14px 16px 12px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="width:8px;height:8px;background:#FF4444;border-radius:50%;animation:pulse 1.5s infinite;"></div>
+              <div style="font-size:11px;color:#FF8888;font-weight:700;letter-spacing:1px;">LIVE NOW</div>
+            </div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);">👁 247 watching</div>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--white);font-weight:700;">Rabbi Landau</div>
+          <div style="font-size:10px;color:var(--gold-light);margin-top:2px;">Private Consultation Session</div>
+        </div>
+        <style>@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }</style>
+        <!-- Live video area -->
+        <div style="background:linear-gradient(135deg,#0A2A2A,#1B4A4A);height:140px;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;">
+          <div style="text-align:center;">
+            <div style="font-size:32px;margin-bottom:4px;">👤</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.4);">Live Stream</div>
+          </div>
+          <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);border-radius:6px;padding:4px 8px;font-size:9px;color:#fff;">01:24:36</div>
+        </div>
+        <!-- Waiting room -->
+        <div style="flex:1;overflow-y:auto;background:var(--cream);padding:12px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none;">
+          <!-- Your position card -->
+          <div style="background:linear-gradient(135deg,var(--teal-dark),var(--teal));border-radius:12px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--gold-light);letter-spacing:1px;margin-bottom:4px;">YOUR POSITION</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--white);">#3</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7);">Est. wait: ~12 minutes</div>
+          </div>
+          <!-- Queue -->
+          <div style="font-size:11px;color:var(--teal-dark);font-weight:700;text-transform:uppercase;letter-spacing:1px;">Waiting Room</div>
+          <div style="background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--soft-border);display:flex;align-items:center;gap:10px;">
+            <div style="width:26px;height:26px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--white);font-weight:700;flex-shrink:0;">1</div>
+            <div style="flex:1;font-size:11px;color:var(--text);">Moshe B. — In session now</div>
+            <div style="font-size:9px;color:var(--green-check);font-weight:600;">● Live</div>
+          </div>
+          <div style="background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--soft-border);display:flex;align-items:center;gap:10px;">
+            <div style="width:26px;height:26px;background:var(--cream-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);font-weight:700;flex-shrink:0;">2</div>
+            <div style="flex:1;font-size:11px;color:var(--text);">Rivka S.</div>
+            <div style="font-size:9px;color:var(--muted);">Waiting</div>
+          </div>
+          <div style="background:var(--teal-pale);border-radius:10px;padding:10px 12px;border:2px solid var(--teal);display:flex;align-items:center;gap:10px;">
+            <div style="width:26px;height:26px;background:var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--white);font-weight:700;flex-shrink:0;">3</div>
+            <div style="flex:1;font-size:11px;color:var(--teal-dark);font-weight:600;">You</div>
+            <div style="font-size:9px;color:var(--teal);font-weight:600;">← You</div>
+          </div>
+          <div style="background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--soft-border);display:flex;align-items:center;gap:10px;">
+            <div style="width:26px;height:26px;background:var(--cream-dark);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);font-weight:700;flex-shrink:0;">4</div>
+            <div style="flex:1;font-size:11px;color:var(--text);">Dovid L.</div>
+            <div style="font-size:9px;color:var(--muted);">Waiting</div>
+          </div>
+          <!-- Leave button -->
+          <div style="border:1px solid rgba(224,92,92,0.3);border-radius:24px;padding:10px;text-align:center;font-size:11px;font-weight:600;color:#E05C5C;">Leave Waiting Room</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 8: SIDEBAR MENU -->
+  <div class="screen-wrap">
+    <div class="screen-label">08 — Sidebar Menu</div>
+    <div class="screen-sublabel">Full Navigation & Settings</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">▲▲▲ WiFi 🔋</span></div>
+      <div class="screen-content">
+        <div style="display:flex;flex:1;overflow:hidden;">
+          <!-- Dimmed background -->
+          <div style="flex:1;background:rgba(20,79,79,0.5);display:flex;align-items:flex-start;padding:14px;font-size:11px;color:rgba(255,255,255,0.5);">
+            ← Tap to close
+          </div>
+          <!-- Sidebar panel -->
+          <div style="width:230px;background:var(--white);display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none;">
+            <!-- User profile area -->
+            <div style="background:var(--teal-dark);padding:20px 16px 16px;">
+              <div style="width:44px;height:44px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px;">👤</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--white);font-weight:700;">Moshe Goldstein</div>
+              <div style="font-size:10px;color:var(--gold-light);margin-top:2px;">Premium Member</div>
+              <div style="background:rgba(255,255,255,0.1);border-radius:20px;padding:3px 10px;font-size:9px;color:var(--gold-light);display:inline-block;margin-top:6px;">The Seeker · Day 14 🔥</div>
+            </div>
+            <!-- Nav sections -->
+            <div style="padding:10px 0;flex:1;">
+              <!-- Main -->
+              <div style="padding:6px 16px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Main</div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;background:var(--teal-pale);border-left:3px solid var(--teal);">
+                <span style="font-size:15px;">🏠</span><span style="font-size:12px;color:var(--teal);font-weight:600;">Home</span>
+              </div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">🤖</span><span style="font-size:12px;color:var(--text);">AI Coach</span>
+              </div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">💬</span><span style="font-size:12px;color:var(--text);">Community</span>
+              </div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">📈</span><span style="font-size:12px;color:var(--text);">Daily Growth</span>
+              </div>
+              <!-- Spiritual -->
+              <div style="padding:6px 16px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:4px;">Spiritual</div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">🕯️</span><span style="font-size:12px;color:var(--text);">Prayer & Blessings</span>
+              </div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">📺</span>
+                <span style="font-size:12px;color:var(--text);">Rabbi Live</span>
+                <div style="margin-left:auto;background:#FF4444;border-radius:10px;padding:2px 6px;font-size:8px;color:#fff;font-weight:700;">LIVE</div>
+              </div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">📚</span><span style="font-size:12px;color:var(--text);">Teaching Library</span>
+              </div>
+              <!-- Account -->
+              <div style="padding:6px 16px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:4px;">Account</div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">⚙️</span><span style="font-size:12px;color:var(--text);">Settings</span>
+              </div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">💳</span><span style="font-size:12px;color:var(--text);">Subscription</span>
+              </div>
+              <div style="padding:10px 16px;display:flex;align-items:center;gap:10px;">
+                <span style="font-size:15px;">🚪</span><span style="font-size:12px;color:#E05C5C;">Sign Out</span>
+              </div>
+            </div>
+            <!-- Logo at bottom -->
+            <div style="padding:14px 16px;border-top:1px solid var(--soft-border);display:flex;align-items:center;gap:6px;">
+              <span style="font-size:14px;">🔥</span>
+              <div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--teal);font-weight:700;">Rivnitz</div>
+                <div style="font-size:8px;color:var(--muted);">Miracles Through Mission</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADMIN PORTAL SECTION -->
+<div style="text-align:center;padding:20px 0 0;color:var(--teal-dark);font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:2px;opacity:0.5;">· · · · · · · · · ·</div>
+<div style="text-align:center;padding:8px 0 8px;color:var(--teal-dark);font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;">Admin Portal — Back End</div>
+<div style="text-align:center;padding:0 0 40px;color:var(--muted);font-size:12px;">Web-based management dashboard — desktop view</div>
+
+<div style="max-width:1200px;margin:0 auto;padding:0 80px 80px;">
+
+  <!-- ADMIN SCREEN 1: DASHBOARD -->
+  <div style="margin-bottom:40px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--teal-dark);font-weight:700;margin-bottom:6px;">09 — Admin Dashboard</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Overview, stats & quick actions</div>
+    <div style="background:var(--white);border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(27,107,107,0.12);border:1px solid var(--soft-border);">
+      <!-- Admin top bar -->
+      <div style="background:var(--teal-dark);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:18px;">🔥</span>
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--white);font-weight:700;">Rivnitz Admin Portal</div>
+            <div style="font-size:10px;color:var(--gold-light);">Management Dashboard</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <div style="font-size:11px;color:rgba(255,255,255,0.6);">👤 Rabbi Landau</div>
+          <div style="background:var(--gold);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--white);font-weight:600;">🔔 3 alerts</div>
+        </div>
+      </div>
+      <!-- Admin nav -->
+      <div style="background:#F0F8F8;border-bottom:1px solid var(--soft-border);padding:0 24px;display:flex;gap:0;">
+        <div style="padding:12px 16px;font-size:12px;color:var(--teal);font-weight:600;border-bottom:2px solid var(--teal);">Dashboard</div>
+        <div style="padding:12px 16px;font-size:12px;color:var(--muted);">Videos</div>
+        <div style="padding:12px 16px;font-size:12px;color:var(--muted);">Users</div>
+        <div style="padding:12px 16px;font-size:12px;color:var(--muted);">Community</div>
+        <div style="padding:12px 16px;font-size:12px;color:var(--muted);">AI Queue</div>
+        <div style="padding:12px 16px;font-size:12px;color:var(--muted);">Live Sessions</div>
+        <div style="padding:12px 16px;font-size:12px;color:var(--muted);">Notifications</div>
+        <div style="padding:12px 16px;font-size:12px;color:var(--muted);">Donations</div>
+      </div>
+      <!-- Stats -->
+      <div style="padding:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+        <div style="background:var(--teal-pale);border-radius:14px;padding:16px;border:1px solid rgba(27,107,107,0.1);">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Total Members</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--teal-dark);font-weight:700;">3,847</div>
+          <div style="font-size:10px;color:var(--green-check);margin-top:4px;">↑ +124 this week</div>
+        </div>
+        <div style="background:var(--gold-pale);border-radius:14px;padding:16px;border:1px solid rgba(212,147,58,0.1);">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Active Subscribers</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--teal-dark);font-weight:700;">1,204</div>
+          <div style="font-size:10px;color:var(--green-check);margin-top:4px;">↑ +38 this week</div>
+        </div>
+        <div style="background:var(--teal-pale);border-radius:14px;padding:16px;border:1px solid rgba(27,107,107,0.1);">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">Donations This Month</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--teal-dark);font-weight:700;">$8,340</div>
+          <div style="font-size:10px;color:var(--green-check);margin-top:4px;">↑ +12% vs last month</div>
+        </div>
+        <div style="background:rgba(224,92,92,0.08);border-radius:14px;padding:16px;border:1px solid rgba(224,92,92,0.1);">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">AI Queue (Pending)</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:#C0392B;font-weight:700;">7</div>
+          <div style="font-size:10px;color:#E05C5C;margin-top:4px;">Needs your review</div>
+        </div>
+      </div>
+      <!-- Quick actions -->
+      <div style="padding:0 24px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        <div style="background:var(--teal);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <span style="font-size:18px;">📹</span>
+          <div>
+            <div style="font-size:12px;color:var(--white);font-weight:600;">Upload New Video</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.6);">Post a new teaching</div>
+          </div>
+        </div>
+        <div style="background:var(--gold);border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <span style="font-size:18px;">📢</span>
+          <div>
+            <div style="font-size:12px;color:var(--white);font-weight:600;">Send Notification</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7);">Push to all users</div>
+          </div>
+        </div>
+        <div style="background:#E05C5C;border-radius:12px;padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;">
+          <span style="font-size:18px;">📺</span>
+          <div>
+            <div style="font-size:12px;color:var(--white);font-weight:600;">Go Live Now</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7);">Start a live session</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN SCREEN 2: AI QUEUE -->
+  <div style="margin-bottom:40px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--teal-dark);font-weight:700;margin-bottom:6px;">10 — AI Escalation Queue</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Flagged questions awaiting Rabbi's guidance</div>
+    <div style="background:var(--white);border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(27,107,107,0.12);border:1px solid var(--soft-border);">
+      <div style="background:var(--teal-dark);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--white);font-weight:700;">AI Escalation Queue</div>
+        <div style="background:rgba(224,92,92,0.8);border-radius:20px;padding:4px 12px;font-size:11px;color:#fff;font-weight:600;">7 Pending</div>
+      </div>
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:12px;">
+        <!-- Queued question 1 -->
+        <div style="border:1px solid var(--soft-border);border-radius:14px;overflow:hidden;">
+          <div style="background:var(--cream);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;background:var(--teal-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--teal);font-weight:600;">YM</div>
+              <div>
+                <div style="font-size:12px;color:var(--teal-dark);font-weight:600;">Yosef M. — The Seeker</div>
+                <div style="font-size:10px;color:var(--muted);">Asked 2 hours ago · Marriage</div>
+              </div>
+            </div>
+            <div style="background:rgba(224,92,92,0.1);border-radius:20px;padding:3px 10px;font-size:10px;color:#E05C5C;font-weight:500;">Needs Guidance</div>
+          </div>
+          <div style="padding:12px 16px;">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-style:italic;">"My wife and I keep having the same argument. I want to do teshuva but she doesn't seem to want to change. Should I just accept things or push harder?"</div>
+            <div style="background:var(--gold-pale);border-radius:8px;padding:10px 12px;margin-bottom:10px;">
+              <div style="font-size:10px;color:var(--gold);font-weight:600;margin-bottom:4px;">Your Guidance (for AI to expand):</div>
+              <div style="width:100%;background:var(--white);border:1px solid rgba(212,147,58,0.3);border-radius:6px;padding:8px;font-size:11px;color:var(--muted);font-style:italic;">Type your direction here...</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <div style="background:var(--teal);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--white);font-weight:600;">Send to AI</div>
+              <div style="border:1px solid var(--soft-border);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--muted);">Skip</div>
+            </div>
+          </div>
+        </div>
+        <!-- Queued question 2 (collapsed) -->
+        <div style="border:1px solid var(--soft-border);border-radius:14px;overflow:hidden;opacity:0.7;">
+          <div style="background:var(--cream);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;background:var(--gold-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--gold);font-weight:600;">SB</div>
+              <div>
+                <div style="font-size:12px;color:var(--teal-dark);font-weight:600;">Sara B. — The Nurturer</div>
+                <div style="font-size:10px;color:var(--muted);">Asked 4 hours ago · Parenting</div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--teal);">▼ Expand</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN SCREEN 3: PUSH NOTIFICATION -->
+  <div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--teal-dark);font-weight:700;margin-bottom:6px;">11 — Push Notification Tool</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Send a custom message to all users instantly</div>
+    <div style="background:var(--white);border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(27,107,107,0.12);border:1px solid var(--soft-border);">
+      <div style="background:var(--teal-dark);padding:14px 24px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--white);font-weight:700;">Send Push Notification</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Broadcast to all 3,847 members instantly</div>
+      </div>
+      <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <!-- Form side -->
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <div style="font-size:11px;color:var(--teal-dark);font-weight:600;margin-bottom:6px;">Notification Title</div>
+            <div style="background:var(--cream);border:1px solid var(--soft-border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text);">🔥 New Teaching from Rabbi Landau</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--teal-dark);font-weight:600;margin-bottom:6px;">Message Body</div>
+            <div style="background:var(--cream);border:1px solid var(--soft-border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text);min-height:70px;">A powerful new teaching is now live. Open the app to watch and begin your journey today.</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--teal-dark);font-weight:600;margin-bottom:6px;">Send To</div>
+            <div style="display:flex;gap:8px;">
+              <div style="background:var(--teal);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--white);font-weight:600;">All Members</div>
+              <div style="border:1px solid var(--soft-border);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--muted);">Premium Only</div>
+              <div style="border:1px solid var(--soft-border);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--muted);">Custom</div>
+            </div>
+          </div>
+          <div style="background:var(--gold);border-radius:12px;padding:12px;text-align:center;font-size:13px;font-weight:600;color:var(--white);">📢 Send to 3,847 Members</div>
+        </div>
+        <!-- Preview side -->
+        <div>
+          <div style="font-size:11px;color:var(--teal-dark);font-weight:600;margin-bottom:10px;">Preview</div>
+          <div style="background:#1C1C1E;border-radius:16px;padding:14px;">
+            <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:8px;">RIVNITZ</div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:11px;color:var(--white);font-weight:600;margin-bottom:3px;">🔥 New Teaching from Rabbi Landau</div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.7);line-height:1.5;">A powerful new teaching is now live. Open the app to watch and begin your journey today.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
