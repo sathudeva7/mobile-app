@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rivnitz Admin Portal</title>
+<!--
+  RIVNITZ ADMIN PORTAL
+  =====================
+  This is a standalone React web app (separate from the mobile app).
+  Deploy this separately on Vercel / Netlify / Firebase Hosting.
+
+  In production, replace this HTML prototype with:
+    cd admin-portal && npx create-react-app . && npm install firebase
+
+  This file serves as the full UI/UX reference and component blueprint.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #1B6B6B; --teal-dark: #144F4F; --teal-light: #2A8A8A;
+    --teal-pale: #E8F4F4; --gold: #D4933A; --gold-light: #E8A94A;
+    --gold-pale: #FDF3E3; --cream: #F5EFE6; --cream-dark: #EDE5D8;
+    --white: #fff; --text: #1A2A2A; --muted: #8A9A9A;
+    --border: rgba(27,107,107,0.15); --error: #E05C5C; --success: #4CAF82;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--text); display:flex; min-height:100vh; }
+
+  /* SIDEBAR */
+  .sidebar { width:220px; background:var(--teal-dark); display:flex; flex-direction:column; flex-shrink:0; }
+  .sidebar-logo { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .sidebar-logo-top { display:flex; align-items:center; gap:8px; }
+  .sidebar-logo-name { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--white); }
+  .sidebar-logo-sub  { font-size:10px; color:var(--gold-light); margin-top:2px; }
+  .sidebar-nav { flex:1; padding:12px 0; }
+  .nav-section { font-size:9px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:1px; font-weight:600; padding:8px 20px 4px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:10px 20px; font-size:13px; color:rgba(255,255,255,0.7); cursor:pointer; transition:background 0.15s; border-left:3px solid transparent; }
+  .nav-item:hover { background:rgba(255,255,255,0.06); }
+  .nav-item.active { background:rgba(255,255,255,0.1); color:var(--white); border-left-color:var(--gold); }
+  .nav-badge { margin-left:auto; background:var(--error); border-radius:20px; padding:1px 7px; font-size:9px; color:#fff; font-weight:600; }
+  .nav-live-badge { margin-left:auto; background:var(--error); border-radius:20px; padding:1px 7px; font-size:9px; color:#fff; font-weight:700; animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .sidebar-user { padding:16px 20px; border-top:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:10px; }
+  .sidebar-avatar { width:34px; height:34px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .sidebar-username { font-size:12px; color:var(--white); font-weight:600; }
+  .sidebar-role     { font-size:10px; color:var(--gold-light); }
+
+  /* MAIN */
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  .topbar { background:var(--white); border-bottom:1px solid var(--border); padding:14px 28px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0; }
+  .topbar-title { font-family:'Cormorant Garamond',serif; font-size:22px; color:var(--teal-dark); font-weight:700; }
+  .topbar-actions { display:flex; gap:10px; }
+  .btn { padding:8px 18px; border-radius:24px; font-size:12px; font-weight:600; cursor:pointer; border:none; font-family:'DM Sans',sans-serif; }
+  .btn-teal  { background:var(--teal); color:#fff; }
+  .btn-gold  { background:var(--gold); color:#fff; }
+  .btn-red   { background:var(--error); color:#fff; }
+  .btn-ghost { background:transparent; border:1px solid var(--border); color:var(--muted); }
+  .content { flex:1; overflow-y:auto; padding:28px; display:flex; flex-direction:column; gap:24px; }
+
+  /* STATS ROW */
+  .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .stat-card { background:var(--white); border-radius:16px; padding:20px; border:1px solid var(--border); }
+  .stat-label { font-size:11px; color:var(--muted); margin-bottom:8px; font-weight:500; }
+  .stat-num   { font-family:'Cormorant Garamond',serif; font-size:38px; color:var(--teal-dark); font-weight:700; line-height:1; }
+  .stat-delta { font-size:10px; margin-top:6px; }
+  .stat-delta.up   { color:var(--success); }
+  .stat-delta.warn { color:var(--error); }
+
+  /* QUICK ACTIONS */
+  .quick-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .action-card { border-radius:14px; padding:18px; display:flex; align-items:center; gap:14px; cursor:pointer; }
+  .action-card.teal  { background:var(--teal); }
+  .action-card.gold  { background:var(--gold); }
+  .action-card.red   { background:var(--error); }
+  .action-icon  { font-size:24px; }
+  .action-title { font-size:13px; color:#fff; font-weight:600; }
+  .action-sub   { font-size:10px; color:rgba(255,255,255,0.7); margin-top:2px; }
+
+  /* GRID 2 COL */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+  /* CARDS */
+  .card { background:var(--white); border-radius:16px; border:1px solid var(--border); overflow:hidden; }
+  .card-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+  .card-title  { font-family:'Cormorant Garamond',serif; font-size:17px; color:var(--teal-dark); font-weight:700; }
+  .card-body   { padding:16px 20px; }
+
+  /* TABLE */
+  table { width:100%; border-collapse:collapse; }
+  th { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; font-weight:600; padding:8px 12px; text-align:left; background:var(--cream); border-bottom:1px solid var(--border); }
+  td { padding:12px; font-size:12px; color:var(--text); border-bottom:1px solid var(--border); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:var(--teal-pale); }
+
+  /* BADGES */
+  .badge { display:inline-block; padding:2px 9px; border-radius:20px; font-size:10px; font-weight:600; }
+  .badge-green  { background:rgba(76,175,130,0.12); color:var(--success); }
+  .badge-gold   { background:var(--gold-pale); color:var(--gold); }
+  .badge-teal   { background:var(--teal-pale); color:var(--teal); }
+  .badge-red    { background:rgba(224,92,92,0.1); color:var(--error); }
+
+  /* AI QUEUE */
+  .queue-item { border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:12px; }
+  .queue-item-header { background:var(--cream); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; }
+  .queue-user   { display:flex; align-items:center; gap:10px; }
+  .queue-avatar { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+  .queue-name   { font-size:12px; color:var(--teal-dark); font-weight:600; }
+  .queue-meta   { font-size:10px; color:var(--muted); }
+  .queue-body   { padding:14px 16px; }
+  .queue-question { font-size:12px; color:var(--muted); font-style:italic; line-height:1.6; margin-bottom:12px; background:var(--cream); border-radius:8px; padding:10px 12px; }
+  .queue-guidance-label { font-size:10px; color:var(--gold); font-weight:600; margin-bottom:6px; }
+  .queue-guidance-input { width:100%; border:1px solid rgba(212,147,58,0.3); border-radius:8px; padding:10px 12px; font-size:12px; color:var(--text); font-family:'DM Sans',sans-serif; background:var(--gold-pale); min-height:60px; resize:vertical; }
+  .queue-actions { display:flex; gap:8px; margin-top:10px; }
+
+  /* NOTIFICATION COMPOSER */
+  .notif-form { display:flex; flex-direction:column; gap:14px; }
+  .form-label { font-size:11px; color:var(--teal-dark); font-weight:600; margin-bottom:5px; }
+  .form-input { width:100%; background:var(--cream); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; }
+  .form-textarea { width:100%; background:var(--cream); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:13px; color:var(--text); font-family:'DM Sans',sans-serif; min-height:80px; resize:vertical; }
+  .audience-btns { display:flex; gap:8px; }
+  .audience-btn { padding:6px 16px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:var(--white); color:var(--muted); font-family:'DM Sans',sans-serif; }
+  .audience-btn.active { background:var(--teal); color:#fff; border-color:var(--teal); }
+
+  /* PHONE PREVIEW */
+  .phone-preview { width:200px; background:#1C1C1E; border-radius:32px; padding:16px 12px; border:2px solid #333; }
+  .preview-notif-app { font-size:9px; color:rgba(255,255,255,0.4); margin-bottom:6px; }
+  .preview-notif { background:rgba(255,255,255,0.1); border-radius:10px; padding:10px 12px; }
+  .preview-notif-title { font-size:11px; color:#fff; font-weight:600; margin-bottom:3px; }
+  .preview-notif-body  { font-size:10px; color:rgba(255,255,255,0.7); line-height:1.5; }
+
+  .notif-preview-row { display:flex; gap:20px; align-items:flex-start; }
+  .notif-form-col { flex:1; }
+
+  /* VIDEO UPLOAD */
+  .upload-area { border:2px dashed var(--border); border-radius:12px; padding:32px; text-align:center; background:var(--teal-pale); cursor:pointer; }
+  .upload-icon { font-size:36px; margin-bottom:8px; }
+  .upload-title { font-size:13px; color:var(--teal); font-weight:600; }
+  .upload-sub   { font-size:11px; color:var(--muted); margin-top:4px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-top">
+      <span style="font-size:20px;">🔥</span>
+      <div>
+        <div class="sidebar-logo-name">Rivnitz</div>
+        <div class="sidebar-logo-sub">Admin Portal</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Main</div>
+    <div class="nav-item active">📊 Dashboard</div>
+    <div class="nav-item">📹 Videos</div>
+    <div class="nav-item">👥 Users</div>
+    <div class="nav-section">Moderation</div>
+    <div class="nav-item">💬 Community <span class="nav-badge">3</span></div>
+    <div class="nav-item">🤖 AI Queue <span class="nav-badge">7</span></div>
+    <div class="nav-section">Broadcast</div>
+    <div class="nav-item">📢 Notifications</div>
+    <div class="nav-item">📺 Live Sessions <span class="nav-live-badge">LIVE</span></div>
+    <div class="nav-section">Finance</div>
+    <div class="nav-item">💳 Donations</div>
+    <div class="nav-item">⚙️ Settings</div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="sidebar-avatar">👤</div>
+    <div>
+      <div class="sidebar-username">Rabbi Landau</div>
+      <div class="sidebar-role">Super Admin</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <div class="topbar-actions">
+      <button class="btn btn-teal">📹 Upload Video</button>
+      <button class="btn btn-gold">📢 Send Notification</button>
+      <button class="btn btn-red">📺 Go Live</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Members</div>
+        <div class="stat-num">3,847</div>
+        <div class="stat-delta up">↑ +124 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active Subscribers</div>
+        <div class="stat-num">1,204</div>
+        <div class="stat-delta up">↑ +38 this week</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Donations This Month</div>
+        <div class="stat-num">$8,340</div>
+        <div class="stat-delta up">↑ +12% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">AI Queue Pending</div>
+        <div class="stat-num" style="color:var(--error)">7</div>
+        <div class="stat-delta warn">⚠ Needs your review</div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+      <div class="action-card teal">
+        <span class="action-icon">📹</span>
+        <div><div class="action-title">Upload New Video</div><div class="action-sub">Post a new teaching</div></div>
+      </div>
+      <div class="action-card gold">
+        <span class="action-icon">📢</span>
+        <div><div class="action-title">Send Notification</div><div class="action-sub">Push to all users</div></div>
+      </div>
+      <div class="action-card red">
+        <span class="action-icon">📺</span>
+        <div><div class="action-title">Go Live Now</div><div class="action-sub">Start a live session</div></div>
+      </div>
+    </div>
+
+    <!-- AI QUEUE + NOTIFICATION COMPOSER -->
+    <div class="grid-2">
+
+      <!-- AI ESCALATION QUEUE -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🤖 AI Escalation Queue</div>
+          <span class="badge badge-red">7 Pending</span>
+        </div>
+        <div class="card-body">
+          <div class="queue-item">
+            <div class="queue-item-header">
+              <div class="queue-user">
+                <div class="queue-avatar" style="background:var(--teal-pale);color:var(--teal);">YM</div>
+                <div>
+                  <div class="queue-name">Yosef M. — The Seeker · INFJ</div>
+                  <div class="queue-meta">Marriage · Asked 2 hours ago</div>
+                </div>
+              </div>
+              <span class="badge badge-red">Needs Guidance</span>
+            </div>
+            <div class="queue-body">
+              <div class="queue-question">"My wife and I keep having the same argument. I want to do teshuva but she doesn't seem to want to change. Should I just accept things or push harder?"</div>
+              <div class="queue-guidance-label">Your Guidance (AI will expand & personalize):</div>
+              <textarea class="queue-guidance-input" placeholder="Type your direction here — e.g. 'Focus on the Baal Shem Tov teaching that we can only change ourselves. Encourage patience and leading by example...'"></textarea>
+              <div class="queue-actions">
+                <button class="btn btn-teal" style="font-size:11px;padding:6px 14px;">Send to AI</button>
+                <button class="btn btn-ghost" style="font-size:11px;padding:6px 14px;">Skip</button>
+              </div>
+            </div>
+          </div>
+          <div class="queue-item" style="opacity:0.6;">
+            <div class="queue-item-header">
+              <div class="queue-user">
+                <div class="queue-avatar" style="background:var(--gold-pale);color:var(--gold);">SB</div>
+                <div>
+                  <div class="queue-name">Sara B. — The Nurturer</div>
+                  <div class="queue-meta">Parenting · Asked 4 hours ago</div>
+                </div>
+              </div>
+              <span style="font-size:11px;color:var(--teal);cursor:pointer;">▼ Expand</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATION COMPOSER -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📢 Send Push Notification</div>
+          <span style="font-size:11px;color:var(--muted);">3,847 members</span>
+        </div>
+        <div class="card-body">
+          <div class="notif-preview-row">
+            <div class="notif-form-col">
+              <div class="notif-form">
+                <div>
+                  <div class="form-label">Title</div>
+                  <input class="form-input" value="🔥 New Teaching from Rabbi Landau" />
+                </div>
+                <div>
+                  <div class="form-label">Message</div>
+                  <textarea class="form-textarea">A powerful new teaching is now live. Open the app to watch and begin your journey today.</textarea>
+                </div>
+                <div>
+                  <div class="form-label">Send To</div>
+                  <div class="audience-btns">
+                    <button class="audience-btn active">All Members</button>
+                    <button class="audience-btn">Premium Only</button>
+                    <button class="audience-btn">Custom</button>
+                  </div>
+                </div>
+                <button class="btn btn-gold" style="width:100%;padding:12px;">📢 Send to 3,847 Members</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--teal-dark);font-weight:600;margin-bottom:8px;">Preview</div>
+              <div class="phone-preview">
+                <div class="preview-notif-app">RIVNITZ</div>
+                <div class="preview-notif">
+                  <div class="preview-notif-title">🔥 New Teaching from Rabbi Landau</div>
+                  <div class="preview-notif-body">A powerful new teaching is now live. Open the app to watch and begin your journey today.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT USERS TABLE -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">👥 Recent Members</div>
+        <button class="btn btn-ghost" style="font-size:11px;padding:6px 14px;">View All</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Member</th>
+            <th>Personality Type</th>
+            <th>Joined</th>
+            <th>Membership</th>
+            <th>Streak</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Moshe Goldstein</strong><br><span style="font-size:10px;color:var(--muted);">moshe@email.com</span></td>
+            <td>The Seeker · INFJ · Type 4</td>
+            <td>2 days ago</td>
+            <td><span class="badge badge-gold">Premium</span></td>
+            <td>🔥 14 days</td>
+            <td><button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;">View</button></td>
+          </tr>
+          <tr>
+            <td><strong>Rivka Levy</strong><br><span style="font-size:10px;color:var(--muted);">rivka@email.com</span></td>
+            <td>The Nurturer · ENFJ · Type 2</td>
+            <td>4 days ago</td>
+            <td><span class="badge badge-teal">Free</span></td>
+            <td>🔥 6 days</td>
+            <td><button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;">View</button></td>
+          </tr>
+          <tr>
+            <td><strong>Dovid Schwartz</strong><br><span style="font-size:10px;color:var(--muted);">dovid@email.com</span></td>
+            <td>The Builder · ENTJ · Type 3</td>
+            <td>1 week ago</td>
+            <td><span class="badge badge-gold">Premium</span></td>
+            <td>🔥 21 days</td>
+            <td><button class="btn btn-ghost" style="font-size:10px;padding:4px 10px;">View</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VIDEO UPLOAD SECTION -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">📹 Upload New Teaching</div>
+      </div>
+      <div class="card-body" style="display:flex;gap:24px;">
+        <div class="upload-area" style="flex:1;" onclick="alert('Video upload — connect to Mux in production')">
+          <div class="upload-icon">📹</div>
+          <div class="upload-title">Click to upload video</div>
+          <div class="upload-sub">MP4, MOV up to 2GB · Hosted on Mux</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <div class="form-label">Title</div>
+            <input class="form-input" placeholder="e.g. The Path of Inner Peace" />
+          </div>
+          <div>
+            <div class="form-label">Description</div>
+            <textarea class="form-textarea" placeholder="Brief description of this teaching..." style="min-height:60px;"></textarea>
+          </div>
+          <div>
+            <div class="form-label">Topics (select all that apply)</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="audience-btn active">Faith</button>
+              <button class="audience-btn">Marriage</button>
+              <button class="audience-btn">Parenting</button>
+              <button class="audience-btn">Anger</button>
+              <button class="audience-btn">Prayer</button>
+              <button class="audience-btn">Daily Life</button>
+            </div>
+          </div>
+          <button class="btn btn-teal" style="padding:12px;">Publish Teaching</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
