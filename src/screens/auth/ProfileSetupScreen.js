@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, ScrollView, ActivityIndicator, Alert,
+  StyleSheet, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Typography, Spacing, Radius, Shadows } from '../../theme';
@@ -21,25 +21,32 @@ export default function ProfileSetupScreen({ navigation }) {
   const [phoneNumber,  setPhoneNumber]  = useState(user?.phoneNumber   || '');
   const [hebrewName,   setHebrewName]   = useState(user?.hebrewName    || '');
   const [mothersName,  setMothersName]  = useState(user?.mothersName   || '');
-  const [saving, setSaving] = useState(false);
+  const [saving] = useState(false);
+  const [nameError, setNameError] = useState('');
 
   const completionPct = [displayName, phoneNumber, hebrewName, mothersName]
     .filter(Boolean).length * 25;
 
-  const handleSave = async () => {
+  const handleSave = () => {
+    console.log('[ProfileSetup] Save pressed');
+    console.log('[ProfileSetup] user:', JSON.stringify(user));
+    console.log('[ProfileSetup] displayName:', displayName);
     if (!displayName.trim()) {
-      Alert.alert('Name required', 'Please enter your name to continue.');
+      setNameError('Please enter your name to continue.');
       return;
     }
-    setSaving(true);
-    await updateProfile({ displayName, phoneNumber, hebrewName, mothersName });
-    await completeOnboarding();
-    setSaving(false);
-    // Navigation handled automatically by auth state change
+    setNameError('');
+    updateProfile({ displayName, phoneNumber, hebrewName, mothersName })
+      .then(res => console.log('[ProfileSetup] updateProfile result:', JSON.stringify(res)))
+      .catch(e => console.warn('[ProfileSetup] updateProfile error:', e));
+    console.log('[ProfileSetup] calling completeOnboarding...');
+    completeOnboarding();
+    navigation.navigate('AppDrawer');
   };
 
-  const handleSkip = async () => {
-    await completeOnboarding();
+  const handleSkip = () => {
+    completeOnboarding();
+    navigation.navigate('AppDrawer');
   };
 
   return (
@@ -81,13 +88,14 @@ export default function ProfileSetupScreen({ navigation }) {
           <View style={styles.fieldGroup}>
             <Text style={styles.fieldLabel}>Full Name *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, nameError ? styles.inputError : null]}
               placeholder="Your full name"
               placeholderTextColor={Colors.textMuted}
               value={displayName}
-              onChangeText={setDisplayName}
+              onChangeText={t => { setDisplayName(t); if (nameError) setNameError(''); }}
               autoCapitalize="words"
             />
+            {nameError ? <Text style={styles.fieldError}>{nameError}</Text> : null}
           </View>
 
           <View style={styles.fieldGroup}>
@@ -204,6 +212,8 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: Colors.border,
   },
   inputMissing: { borderStyle: 'dashed', borderColor: 'rgba(212,147,58,0.5)', borderWidth: 2 },
+  inputError: { borderColor: Colors.error, borderWidth: 1.5 },
+  fieldError: { fontSize: Typography.sizes.xs, color: Colors.error, fontFamily: Typography.body, marginTop: 4, marginLeft: 2 },
 
   buttons: { gap: Spacing.md, marginTop: Spacing.sm },
   saveBtn: { backgroundColor: Colors.gold, borderRadius: Radius.xl, padding: Spacing.base, alignItems: 'center', ...Shadows.gold },

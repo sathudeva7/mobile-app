@@ -2,17 +2,19 @@
   "expo": {
     "name": "Rivnitz",
     "slug": "rivnitz",
+    "scheme": "rivnitz",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#144F4F"
     },
     "assetBundlePatterns": [
-      "**/*"
+      "assets/*",
+      "assets/fonts/*"
     ],
     "ios": {
       "supportsTablet": false,
@@ -21,32 +23,52 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Rivnitz uses your camera for face reading during the nature discovery quiz.",
         "NSPhotoLibraryUsageDescription": "Rivnitz accesses your photos for profile picture and face reading.",
-        "NSMicrophoneUsageDescription": "Rivnitz uses your microphone during live Rabbi sessions."
+        "NSMicrophoneUsageDescription": "Rivnitz uses your microphone during live Rabbi sessions.",
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.469986977960-m9o38hrvmusavmcaiip2lv0om0agf8h0"
+            ]
+          }
+        ]
       }
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
-        "foregroundImage": "g",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#144F4F"
       },
       "package": "com.rivnitz.app",
       "versionCode": 1,
+      "googleServicesFile": "./google-services.json",
       "permissions": [
+        "INTERNET",
         "CAMERA",
-        "READ_EXTERNAL_STORAGE",
         "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS",
+        "ACCESS_NETWORK_STATE",
+        "READ_EXTERNAL_STORAGE",
         "VIBRATE",
         "RECEIVE_BOOT_COMPLETED"
       ]
     },
     "web": {
-      "favicon": ""
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      ["@react-native-google-signin/google-signin", { "iosUrlScheme": "com.googleusercontent.apps.469986977960-m9o38hrvmusavmcaiip2lv0om0agf8h0" }],
       "expo-web-browser",
       "expo-camera",
       "expo-image-picker",
-      "expo-notifications",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#144F4F",
+          "defaultChannel": "default"
+        }
+      ],
       [
         "expo-av",
         {

@@ -7,10 +7,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView,
-  StyleSheet, Dimensions, ActivityIndicator,
+  StyleSheet, Dimensions, ActivityIndicator, Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
+import YoutubePlayer from 'react-native-youtube-iframe';
 import { Colors, Typography, Spacing, Radius, Shadows } from '../../theme';
 import { trackVideoView, getMuxPlaybackUrl } from '../../services/videoService';
 import { useAuthStore } from '../../store/authStore';
@@ -23,17 +24,25 @@ export default function VideoPlayerScreen({ route, navigation }) {
   const videoRef         = useRef(null);
   const [status, setStatus] = useState({});
   const [loading, setLoading] = useState(true);
+  const [embedBlocked, setEmbedBlocked] = useState(false);
+  const [viewCount, setViewCount] = useState(video.viewCount || 0);
   const viewTracked      = useRef(false);
 
-  const playbackUrl = getMuxPlaybackUrl(video.muxPlaybackId) || video.videoUrl;
+  const isYoutube   = video.videoType === 'youtube';
+  const playbackUrl = isYoutube
+    ? null
+    : (getMuxPlaybackUrl(video.muxPlaybackId) || video.videoUrl);
 
-  // Track view after 10 seconds of watch time
+
+  // Track view after 10 seconds of continuous watch time
   useEffect(() => {
-    if (status.positionMillis > 10000 && !viewTracked.current) {
+    if (status.isLoaded && status.positionMillis > 10000 && !viewTracked.current) {
       viewTracked.current = true;
-      trackVideoView(video.id, user?.uid);
+      trackVideoView(video.id, user?.uid).then(success => {
+        if (success) setViewCount(prev => prev + 1);
+      });
     }
-  }, [status.positionMillis]);
+  }, [status.isLoaded, status.positionMillis]);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -42,7 +51,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
         <Text style={styles.backBtnText}>←  Back</Text>
       </TouchableOpacity>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.scroll}>
         {/* Video player */}
         <View style={styles.playerContainer}>
           {loading && (
@@ -50,7 +59,33 @@ export default function VideoPlayerScreen({ route, navigation }) {
               <ActivityIndicator size="large" color={Colors.gold} />
             </View>
           )}
-          {playbackUrl ? (
+          {isYoutube ? (
+            embedBlocked ? (
+              <View style={[styles.player, styles.playerPlaceholder]}>
+                <Text style={styles.embedBlockedIcon}>▶</Text>
+                <Text style={styles.embedBlockedTitle}>Embedding disabled for this video</Text>
+                <TouchableOpacity
+                  style={styles.watchOnYoutubeBtn}
+                  onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${video.youtubeVideoId}`)}
+                >
+                  <Text style={styles.watchOnYoutubeBtnText}>Watch on YouTube</Text>
+                </TouchableOpacity>
+              </View>
+            ) : video.youtubeVideoId ? (
+              <YoutubePlayer
+                height={width * 0.5625}
+                width={width}
+                videoId={video.youtubeVideoId}
+                play
+                onReady={() => setLoading(false)}
+                onError={() => { setLoading(false); setEmbedBlocked(true); }}
+              />
+            ) : (
+              <View style={[styles.player, styles.playerPlaceholder]}>
+                <Text style={styles.playerPlaceholderText}>Video unavailable</Text>
+              </View>
+            )
+          ) : playbackUrl ? (
             <Video
               ref={videoRef}
               style={styles.player}
@@ -76,7 +111,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
             <Text style={styles.videoMetaDot}>·</Text>
             <Text style={styles.videoMetaText}>{video.postedDate}</Text>
             <Text style={styles.videoMetaDot}>·</Text>
-            <Text style={styles.videoMetaText}>{video.viewCount || 0} views</Text>
+            <Text style={styles.videoMetaText}>{viewCount} views</Text>
           </View>
 
           {/* Topic tags */}
@@ -125,9 +160,14 @@ const styles = StyleSheet.create({
   playerContainer: { position: 'relative', backgroundColor: Colors.black, width, height: width * 0.5625 },
   playerLoader: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
   player: { width, height: width * 0.5625 },
-  playerPlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.tealDark },
+  playerPlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.tealDark, gap: Spacing.sm },
   playerPlaceholderText: { color: Colors.textMuted, fontFamily: Typography.body, fontSize: Typography.sizes.sm },
+  embedBlockedIcon: { fontSize: 32, color: Colors.white },
+  embedBlockedTitle: { color: Colors.white, fontFamily: Typography.body, fontSize: Typography.sizes.sm, textAlign: 'center', paddingHorizontal: Spacing.base },
+  watchOnYoutubeBtn: { backgroundColor: '#FF0000', borderRadius: Radius.md, paddingHorizontal: Spacing.base, paddingVertical: Spacing.sm, marginTop: Spacing.xs },
+  watchOnYoutubeBtnText: { color: Colors.white, fontFamily: Typography.bodySemiBold, fontSize: Typography.sizes.sm },
 
+  scroll: { backgroundColor: Colors.cream },
   infoSection: { backgroundColor: Colors.cream, padding: Spacing.base, gap: Spacing.md },
 
   videoTitle: { fontFamily: Typography.bodySemiBold, fontSize: Typography.sizes.lg, color: Colors.textPrimary, lineHeight: 24 },

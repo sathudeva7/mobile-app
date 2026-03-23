@@ -59,4 +59,7 @@ export const COLLECTIONS = {
   // ─── Knowledge Base (admin-controlled AI brain) ───────────────
   AI_KNOWLEDGE:   'ai_knowledge',   // individual teaching entries
   AI_CONFIG:      'ai_config',      // system_prompt doc + behavior doc
+
+  // ─── User-submitted dedications ───────────────────────────────
+  DEDICATED_VIDEOS: 'dedicated_videos',
 };

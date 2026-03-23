@@ -88,9 +88,9 @@ export async function scheduleMorningMotivation(hour = 9, minute = 0) {
       data:  { screen: 'Growth' },
     },
     trigger: {
+      type:   Notifications.SchedulableTriggerInputTypes.DAILY,
       hour,
       minute,
-      repeats: true,
     },
   });
 }
@@ -103,7 +103,7 @@ export async function cancelMorningNotifications() {
       await Notifications.cancelScheduledNotificationAsync(notif.identifier);
     }
   }
-}
+}  
 
 // ─── Listen for notification interactions ────────────────────────
 // Call this in App.js to handle navigation from notification taps

@@ -19,24 +19,31 @@
  *       └── SettingsScreen
  */
 
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Platform } from 'react-native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { setupNotificationListeners } from '../services/notifications';
+
+export const navigationRef = createNavigationContainerRef();
 
 import { Colors, Typography, Spacing } from '../theme';
 import { useAuthStore } from '../store/authStore';
 
 // ─── Screen Imports ───────────────────────────────────────────────
 // Auth
-import LoginScreen        from '../screens/auth/LoginScreen';
-import SignUpScreen       from '../screens/auth/SignUpScreen';
-import OnboardingScreen   from '../screens/auth/OnboardingScreen';
-import NatureQuizScreen   from '../screens/auth/NatureQuizScreen';
-import ProfileSetupScreen from '../screens/auth/ProfileSetupScreen';
+import LoginScreen             from '../screens/auth/LoginScreen';
+import SignUpScreen            from '../screens/auth/SignUpScreen';
+import OnboardingScreen        from '../screens/auth/OnboardingScreen';
+import NatureQuizScreen        from '../screens/auth/NatureQuizScreen';
+import AIAssessmentScreen      from '../screens/auth/AIAssessmentScreen';
+import PhotoReadingScreen      from '../screens/auth/PhotoReadingScreen';
+import ProfileRevealScreen     from '../screens/auth/ProfileRevealScreen';
+import ProfileSetupScreen      from '../screens/auth/ProfileSetupScreen';
+import EmailVerificationScreen from '../screens/auth/EmailVerificationScreen';
 
 // Main tabs
 import HomeScreen         from '../screens/home/HomeScreen';
@@ -98,10 +105,10 @@ function CustomDrawerContent({ navigation }) {
 
   const menuItems = [
     { section: 'Main', items: [
-      { label: 'Home',           icon: '🏠', screen: 'MainTabs' },
-      { label: 'AI Coach',       icon: '🤖', screen: 'MainTabs' },
-      { label: 'Community',      icon: '💬', screen: 'MainTabs' },
-      { label: 'Daily Growth',   icon: '📈', screen: 'MainTabs' },
+      { label: 'Home',           icon: '🏠', screen: 'MainTabs', tab: 'Home' },
+      { label: 'AI Coach',       icon: '🤖', screen: 'MainTabs', tab: 'Coach' },
+      { label: 'Community',      icon: '💬', screen: 'MainTabs', tab: 'Community' },
+      { label: 'Daily Growth',   icon: '📈', screen: 'MainTabs', tab: 'Growth' },
     ]},
     { section: 'Spiritual', items: [
       { label: 'Prayer & Blessings', icon: '🕯️', screen: 'Prayers' },
@@ -136,7 +143,7 @@ function CustomDrawerContent({ navigation }) {
       </View>
 
       {/* Menu items */}
-      <View style={styles.drawerMenu}>
+      <ScrollView style={styles.drawerMenu} showsVerticalScrollIndicator={false}>
         {menuItems.map((group) => (
           <View key={group.section}>
             <Text style={styles.drawerSection}>{group.section}</Text>
@@ -144,7 +151,7 @@ function CustomDrawerContent({ navigation }) {
               <TouchableOpacity
                 key={item.label}
                 style={styles.drawerItem}
-                onPress={() => navigation.navigate(item.screen)}
+                onPress={() => navigation.navigate(item.screen, item.tab ? { screen: item.tab } : undefined)}
               >
                 <Text style={styles.drawerItemIcon}>{item.icon}</Text>
                 <Text style={styles.drawerItemLabel}>{item.label}</Text>
@@ -165,14 +172,14 @@ function CustomDrawerContent({ navigation }) {
             Sign Out
           </Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       {/* Brand footer */}
       <View style={styles.drawerFooter}>
         <Text style={styles.drawerFooterFlame}>🔥</Text>
         <View>
           <Text style={styles.drawerFooterName}>Rivnitz</Text>
-          <Text style={styles.drawerFooterTagline}>Miracles Through Mission</Text>
+          <Text style={styles.drawerFooterTagline}>Miracles Through MissionS</Text>
         </View>
       </View>
     </View>
@@ -203,23 +210,88 @@ function AppDrawer() {
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login"        component={LoginScreen} />
-      <Stack.Screen name="SignUp"       component={SignUpScreen} />
-      <Stack.Screen name="Onboarding"   component={OnboardingScreen} />
-      <Stack.Screen name="NatureQuiz"   component={NatureQuizScreen} />
-      <Stack.Screen name="ProfileSetup" component={ProfileSetupScreen} />
+      <Stack.Screen name="Login"  component={LoginScreen} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// ─── Onboarding Stack (post-verification, pre-app) ────────────────
+// Shown when the user is verified but hasn't completed onboarding/quiz.
+// initialRouteName skips the welcome screen if onboarding was already done
+// (e.g. after a quiz reset — goes straight to NatureQuiz).
+function OnboardingStack() {
+  const { hasCompletedOnboarding } = useAuthStore();
+  return (
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName={hasCompletedOnboarding ? 'NatureQuiz' : 'Onboarding'}
+    >
+      <Stack.Screen name="Onboarding"    component={OnboardingScreen} />
+      <Stack.Screen name="NatureQuiz"    component={NatureQuizScreen} />
+      <Stack.Screen name="AIAssessment"  component={AIAssessmentScreen} />
+      <Stack.Screen name="PhotoReading"  component={PhotoReadingScreen} />
+      <Stack.Screen name="ProfileReveal" component={ProfileRevealScreen} />
+      <Stack.Screen name="ProfileSetup"  component={ProfileSetupScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// ─── Email Verification Stack ─────────────────────────────────────
+function VerifyStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="EmailVerification" component={EmailVerificationScreen} />
+      <Stack.Screen name="Login"  component={LoginScreen} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// ─── App Stack (Drawer + modal screens pushed on top) ─────────────
+function AppStack() {
+  const { hasCompletedOnboarding } = useAuthStore();
+  return (
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName={hasCompletedOnboarding ? 'AppDrawer' : 'ProfileSetup'}
+    >
+      <Stack.Screen name="AppDrawer"     component={AppDrawer} />
+      <Stack.Screen name="ProfileSetup"  component={ProfileSetupScreen} />
+      <Stack.Screen name="VideoPlayer"   component={VideoPlayerScreen} />
+      <Stack.Screen name="NatureQuiz"    component={NatureQuizScreen} />
+      <Stack.Screen name="AIAssessment"  component={AIAssessmentScreen} />
+      <Stack.Screen name="PhotoReading"  component={PhotoReadingScreen} />
+      <Stack.Screen name="ProfileReveal" component={ProfileRevealScreen} />
     </Stack.Navigator>
   );
 }
 
 // ─── Root Navigator ───────────────────────────────────────────────
 export default function RootNavigator() {
-  const { isLoggedIn, hasCompletedOnboarding } = useAuthStore();
+  const { isLoggedIn, isEmailVerified, isProfileLoaded } = useAuthStore();
+
+  useEffect(() => {
+    // Listen for notification taps and navigate to the right screen
+    const cleanup = setupNotificationListeners(navigationRef);
+    return cleanup;
+  }, []);
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        {isLoggedIn ? <AppDrawer /> : <AuthStack />}
+      <NavigationContainer ref={navigationRef}>
+        {!isLoggedIn
+          ? <AuthStack />
+          : !isEmailVerified
+            ? <VerifyStack />
+            : !isProfileLoaded
+              ? (
+                <View style={styles.loadingScreen}>
+                  <ActivityIndicator size="large" color={Colors.teal} />
+                </View>
+              )
+              : <AppStack />
+        }
       </NavigationContainer>
     </SafeAreaProvider>
   );
@@ -227,14 +299,20 @@ export default function RootNavigator() {
 
 // ─── Styles ───────────────────────────────────────────────────────
 const styles = StyleSheet.create({
+  loadingScreen: {
+    flex: 1,
+    backgroundColor: Colors.cream,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   // Bottom tabs
   tabBar: {
     backgroundColor: Colors.white,
     borderTopColor: Colors.borderLight,
     borderTopWidth: 1,
-    paddingBottom: 8,
     paddingTop: 8,
-    height: 60,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+    height: Platform.OS === 'ios' ? 82 : 60,
   },
   tabLabel: {
     fontSize: 9,

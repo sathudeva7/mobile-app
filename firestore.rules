@@ -16,29 +16,58 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
+    // Admin portal users are stored in the admins collection (not users)
+    function isPortalAdmin() {
+      return isLoggedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Super admin check — also accepts legacy 'admin' role during migration
+    function isPortalSuperAdmin() {
+      return isPortalAdmin() && (
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'super_admin' ||
+        get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin'
+      );
+    }
+
     // ─── Users ─────────────────────────────────────────────────────
     match /users/{userId} {
-      allow read:   if isLoggedIn() && (isOwner(userId) || isAdmin());
+      allow read:   if true;
       allow create: if isLoggedIn() && isOwner(userId);
-      allow update: if isLoggedIn() && (isOwner(userId) || isAdmin());
-      allow delete: if isAdmin();
+      allow update: if isLoggedIn() && (isOwner(userId) || isAdmin() || isPortalAdmin());
+      allow delete: if isAdmin() || isPortalSuperAdmin();
     }
 
     // ─── Videos ────────────────────────────────────────────────────
     match /videos/{videoId} {
-      allow read:   if isLoggedIn();
-      allow write:  if isAdmin();
+      allow read:   if true; // public — teachings page is unauthenticated
+      allow create: if isAdmin() || isPortalAdmin();
+      allow delete: if isAdmin() || isPortalAdmin();
+      // Admins can update anything; logged-in users may only increment viewCount
+      allow update: if isAdmin() || isPortalAdmin() ||
+        (isLoggedIn() &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']));
     }
 
     // ─── Community Posts ───────────────────────────────────────────
     match /community_posts/{postId} {
-      allow read:   if isLoggedIn();
+      allow read:   if isLoggedIn() || isPortalAdmin();
       allow create: if isLoggedIn();
       allow update: if isLoggedIn() && (
-        request.auth.uid == resource.data.authorId || isAdmin()
+        request.auth.uid == resource.data.authorId || isAdmin() || isPortalAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes', 'replyCount'])
       );
-      allow delete: if isAdmin() ||
+      allow delete: if isAdmin() || isPortalAdmin() ||
         (isLoggedIn() && request.auth.uid == resource.data.authorId);
+
+      // Replies sub-collection
+      match /replies/{replyId} {
+        allow read:   if isLoggedIn() || isPortalAdmin();
+        allow create: if isLoggedIn();
+        allow update: if isLoggedIn() && request.auth.uid == resource.data.authorId;
+        allow delete: if isAdmin() || isPortalAdmin() ||
+          (isLoggedIn() && request.auth.uid == resource.data.authorId);
+      }
     }
 
     // ─── AI Sessions ───────────────────────────────────────────────
@@ -73,26 +102,26 @@ service cloud.firestore {
 
     // ─── Live Sessions ─────────────────────────────────────────────
     match /live_sessions/{sessionId} {
-      allow read: if isLoggedIn();
-      allow write: if isAdmin();
+      allow read:   if isLoggedIn() || isPortalAdmin();
+      allow write:  if isAdmin() || isPortalAdmin();
 
       // Waiting room sub-collection
       match /waitingRoom/{entryId} {
-        allow read:   if isLoggedIn();
+        allow read:   if isLoggedIn() || isPortalAdmin();
         allow create: if isLoggedIn();
         allow update: if isLoggedIn() && (
           resource.data.userId == request.auth.uid || isAdmin()
-        );
-        allow delete: if isAdmin();
+        ) || isPortalAdmin();
+        allow delete: if isAdmin() || isPortalAdmin();
       }
     }
 
     // ─── Daily Tasks ───────────────────────────────────────────────
     match /daily_tasks/{docId} {
       allow read:   if isLoggedIn() && (
-        resource.data.userId == request.auth.uid || isAdmin()
+        resource == null || resource.data.userId == request.auth.uid || isAdmin()
       );
-      allow create: if isLoggedIn();
+      allow create: if isLoggedIn() && request.resource.data.userId == request.auth.uid;
       allow update: if isLoggedIn() && resource.data.userId == request.auth.uid;
       allow delete: if isAdmin();
     }
@@ -113,18 +142,57 @@ service cloud.firestore {
 
     // ─── Donations ─────────────────────────────────────────────────
     match /donations/{donationId} {
-      allow read:   if isAdmin() || (
+      allow read:   if isPortalAdmin() || isAdmin() || (
         isLoggedIn() && resource.data.userId == request.auth.uid
       );
       allow create: if isLoggedIn();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow update: if isAdmin() || isPortalAdmin();
+      allow delete: if isAdmin() || isPortalAdmin();
     }
 
     // ─── Notifications ─────────────────────────────────────────────
     match /notifications/{notifId} {
       allow read:   if isLoggedIn();
       allow write:  if isAdmin();
+    }
+
+    // ─── Admins ────────────────────────────────────────────────────
+    // Any portal admin can list/read all admin docs (admin management page).
+    // Super admin can create, update, and delete other admin docs.
+    // Any admin can always update their own doc (e.g. role migration, lastLoginAt).
+    match /admins/{userId} {
+      allow read:   if isPortalAdmin();
+      allow create: if isPortalSuperAdmin() || (isLoggedIn() && isOwner(userId));
+      allow update: if isPortalSuperAdmin() || (isLoggedIn() && isOwner(userId));
+      allow delete: if isPortalSuperAdmin() && !isOwner(userId);
+    }
+
+    // ─── Gallery ───────────────────────────────────────────────────
+    match /gallery/{itemId} {
+      allow read:   if true;
+      allow create: if isPortalAdmin();
+      allow update: if isPortalAdmin();
+      allow delete: if isPortalAdmin();
+    }
+
+    // ─── Contact Messages ──────────────────────────────────────────
+    // Anyone (including unauthenticated visitors) can submit a message.
+    // Only portal admins can read, update, or delete.
+    match /contact_messages/{msgId} {
+      allow create: if true;
+      allow read:   if isPortalAdmin() || isAdmin();
+      allow update: if isPortalAdmin() || isAdmin();
+      allow delete: if isPortalAdmin() || isAdmin();
+    }
+
+    // ─── RAG Documents ─────────────────────────────────────────────
+    // Metadata about uploaded documents (title, status, chunkCount, topics).
+    // The DocumentsTab in the admin portal reads this via onSnapshot (client SDK).
+    // Actual writes come from the API routes via Firebase Admin SDK which
+    // bypasses rules entirely — client-side write rules are a safety net only.
+    match /rag_documents/{docId} {
+      allow read:   if isPortalAdmin();
+      allow write:  if isPortalAdmin();
     }
   }
 }

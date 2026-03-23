@@ -15,8 +15,11 @@ import {
 } from '@expo-google-fonts/dm-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { StripeProvider } from '@stripe/stripe-react-native';
 import RootNavigator from './src/navigation';
 import { useAuthStore } from './src/store/authStore';
+import { googleSignIn, stripe } from './src/config';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,6 +35,15 @@ export default function App() {
   });
 
   useEffect(() => {
+    try {
+      GoogleSignin.configure({
+        webClientId:   googleSignIn.webClientId,
+        iosClientId:   googleSignIn.iosClientId,
+        offlineAccess: false,
+      });
+    } catch (e) {
+      console.warn('GoogleSignin.configure failed:', e);
+    }
     initAuth();
   }, []);
 
@@ -45,7 +57,12 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <RootNavigator />
+      <StripeProvider
+        publishableKey={stripe.publishableKey}
+        merchantIdentifier="merchant.com.rivnitz"
+      >
+        <RootNavigator />
+      </StripeProvider>
     </GestureHandlerRootView>
   );
 }

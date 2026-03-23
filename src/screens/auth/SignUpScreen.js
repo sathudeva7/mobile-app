@@ -1,149 +1,434 @@
 /**
- * SignUpScreen
- * Create new account with email/password or Google.
+ * SignUpScreen — Create new account with email/password or Google.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform, Alert,
+  ScrollView, ActivityIndicator, KeyboardAvoidingView,
+  Platform, Image, Animated,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Google from 'expo-auth-session/providers/google';
-import * as WebBrowser from 'expo-web-browser';
 import { Colors, Typography, Spacing, Radius, Shadows } from '../../theme';
-import { useAuthStore } from '../../store/authStore';
-import { googleSignIn } from '../../config';
+import { useAuthStore, isGoogleSignInAvailable } from '../../store/authStore';
 
-WebBrowser.maybeCompleteAuthSession();
+// ─── Ornamental horizontal rule ───────────────────────────────────
+const OrnamentalRule = ({ label }) => (
+  <View style={or.row}>
+    <View style={or.line} />
+    {label
+      ? <Text style={or.label}>{label}</Text>
+      : <Text style={or.glyph}>✦</Text>
+    }
+    <View style={or.line} />
+  </View>
+);
 
+const or = StyleSheet.create({
+  row:   { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  line:  { flex: 1, height: 1, backgroundColor: 'rgba(27,107,107,0.15)' },
+  glyph: { fontSize: 10, color: Colors.gold },
+  label: { fontSize: 9, color: Colors.textMuted, fontFamily: Typography.body, letterSpacing: 1.5 },
+});
+
+// ─── Underline form field ─────────────────────────────────────────
+const FormField = ({ label, error, ...inputProps }) => {
+  const [focused, setFocused] = useState(false);
+  return (
+    <View style={ff.wrapper}>
+      <Text style={[ff.label, focused && ff.labelFocused]}>{label}</Text>
+      <TextInput
+        style={ff.input}
+        placeholderTextColor="transparent"
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        {...inputProps}
+      />
+      <View style={[ff.line, focused && ff.lineFocused, error && ff.lineError]} />
+      {error ? <Text style={ff.error}>{error}</Text> : null}
+    </View>
+  );
+};
+
+const ff = StyleSheet.create({
+  wrapper: { gap: 2 },
+  label: {
+    fontSize: 9,
+    letterSpacing: 2,
+    color: Colors.teal,
+    fontFamily: Typography.bodyMedium,
+    textTransform: 'uppercase',
+  },
+  labelFocused: { color: Colors.gold },
+  input: {
+    backgroundColor: 'transparent',
+    paddingVertical: Spacing.sm + 2,
+    paddingHorizontal: 0,
+    fontSize: Typography.sizes.base,
+    color: Colors.textPrimary,
+    fontFamily: Typography.body,
+  },
+  line:        { height: 1,   backgroundColor: 'rgba(27,107,107,0.2)' },
+  lineFocused: { height: 1.5, backgroundColor: Colors.gold },
+  lineError:   { backgroundColor: Colors.error },
+  error: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.error,
+    fontFamily: Typography.body,
+    marginTop: 4,
+  },
+});
+
+// ─── Main Screen ──────────────────────────────────────────────────
 export default function SignUpScreen({ navigation }) {
   const [name,     setName]     = useState('');
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [confirm,  setConfirm]  = useState('');
-  const { signUpWithEmail, signInWithGoogle, isLoading, error, clearError, isGoogleSignInAvailable } = useAuthStore();
 
-  const [, googleResponse, promptGoogleAsync] = Google.useAuthRequest({
-    webClientId:     googleSignIn.webClientId,
-    iosClientId:     googleSignIn.iosClientId,
-    androidClientId: googleSignIn.androidClientId,
-  });
+  const [nameError,     setNameError]     = useState('');
+  const [emailError,    setEmailError]    = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmError,  setConfirmError]  = useState('');
+
+  const { signUpWithEmail, signInWithGoogle, isLoading, error, clearError } = useAuthStore();
+
+  // Entrance animations
+  const headerAnim = useRef(new Animated.Value(0)).current;
+  const formAnim   = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (googleResponse?.type === 'success') {
-      const idToken = googleResponse.authentication?.idToken;
-      if (idToken) signInWithGoogle(idToken);
-    }
-  }, [googleResponse]);
+    Animated.stagger(180, [
+      Animated.timing(headerAnim, { toValue: 1, duration: 650, useNativeDriver: true }),
+      Animated.timing(formAnim,   { toValue: 1, duration: 550, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  const headerStyle = {
+    opacity: headerAnim,
+    transform: [{ translateY: headerAnim.interpolate({ inputRange: [0, 1], outputRange: [24, 0] }) }],
+  };
+  const formStyle = {
+    opacity: formAnim,
+    transform: [{ translateY: formAnim.interpolate({ inputRange: [0, 1], outputRange: [24, 0] }) }],
+  };
 
   const handleSignUp = async () => {
-    if (!name.trim())     return Alert.alert('Missing', 'Please enter your name.');
-    if (!email.trim())    return Alert.alert('Missing', 'Please enter your email.');
-    if (password.length < 6) return Alert.alert('Weak password', 'Password must be at least 6 characters.');
-    if (password !== confirm) return Alert.alert('Mismatch', 'Passwords do not match.');
-
+    let valid = true;
+    if (!name.trim())       { setNameError('Please enter your name.');                    valid = false; } else { setNameError(''); }
+    if (!email.trim())      { setEmailError('Please enter your email.');                  valid = false; } else { setEmailError(''); }
+    if (password.length < 6){ setPasswordError('Password must be at least 6 characters.'); valid = false; } else { setPasswordError(''); }
+    if (password !== confirm){ setConfirmError('Passwords do not match.');                valid = false; } else { setConfirmError(''); }
+    if (!valid) return;
     clearError();
     await signUpWithEmail(email, password, name);
+    navigation.navigate('EmailVerification');
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={s.container} edges={['bottom']}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-              <Text style={styles.backBtnText}>←</Text>
-            </TouchableOpacity>
-            <Text style={styles.headerFlame}>🔥</Text>
-            <Text style={styles.headerTitle}>Join Rivnitz</Text>
-            <Text style={styles.headerSub}>Begin your journey of miracles through mission</Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={s.scroll}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
 
-          <View style={styles.form}>
+          {/* ── Header ──────────────────────────────────────────── */}
+          <Animated.View style={[s.header, headerStyle]}>
+
+            {/* Back button */}
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={s.backBtn}
+              activeOpacity={0.6}
+            >
+              <Text style={s.backArrow}>←</Text>
+              <Text style={s.backText}>Back</Text>
+            </TouchableOpacity>
+
+            {/* Logo with gold aura ring */}
+            <View style={s.iconRing}>
+              <Image source={require('../../../assets/icon.png')} style={s.icon} />
+            </View>
+
+            {/* Headline */}
+            <Text style={s.headline}>Begin Your{'\n'}Journey</Text>
+
+            {/* Ornamental divider */}
+            <View style={s.ornamentRow}>
+              <View style={s.ornamentLine} />
+              <Text style={s.ornamentGlyph}>✦</Text>
+              <View style={s.ornamentLine} />
+            </View>
+
+            <Text style={s.subHeadline}>Join the Rivnitz Community</Text>
+          </Animated.View>
+
+          {/* ── Form ────────────────────────────────────────────── */}
+          <Animated.View style={[s.form, formStyle]}>
+
+            {/* Firebase auth error */}
             {error && (
-              <View style={styles.errorBox}>
-                <Text style={styles.errorText}>{error}</Text>
+              <View style={s.errorBox}>
+                <Text style={s.errorText}>✦  {error}</Text>
               </View>
             )}
 
-            {/* Google — hidden in Expo Go (requires dev build) */}
+            {/* Google */}
             {isGoogleSignInAvailable && (
               <>
-                <TouchableOpacity style={styles.googleBtn} onPress={() => { clearError(); promptGoogleAsync(); }} disabled={isLoading}>
-                  <View style={styles.googleIcon}><Text style={styles.googleIconText}>G</Text></View>
-                  <Text style={styles.googleBtnText}>Continue with Google</Text>
+                <TouchableOpacity
+                  style={s.googleBtn}
+                  onPress={() => { clearError(); signInWithGoogle(); }}
+                  disabled={isLoading}
+                  activeOpacity={0.7}
+                >
+                  <View style={s.googleLogoRing}>
+                    <Text style={s.googleG}>G</Text>
+                  </View>
+                  <Text style={s.googleBtnText}>Continue with Google</Text>
                 </TouchableOpacity>
-                <View style={styles.divider}>
-                  <View style={styles.dividerLine} />
-                  <Text style={styles.dividerText}>or create account</Text>
-                  <View style={styles.dividerLine} />
-                </View>
+                <OrnamentalRule label="OR CREATE ACCOUNT" />
               </>
             )}
 
-            <TextInput style={styles.input} placeholder="Full name" placeholderTextColor={Colors.textMuted} value={name} onChangeText={setName} autoCapitalize="words" />
-            <TextInput style={styles.input} placeholder="Email address" placeholderTextColor={Colors.textMuted} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
-            <TextInput style={styles.input} placeholder="Password (min 6 characters)" placeholderTextColor={Colors.textMuted} value={password} onChangeText={setPassword} secureTextEntry />
-            <TextInput style={styles.input} placeholder="Confirm password" placeholderTextColor={Colors.textMuted} value={confirm} onChangeText={setConfirm} secureTextEntry />
+            {/* Full name */}
+            <FormField
+              label="Full name"
+              error={nameError}
+              value={name}
+              onChangeText={t => { setName(t); if (nameError) setNameError(''); }}
+              autoCapitalize="words"
+            />
 
+            {/* Email */}
+            <FormField
+              label="Email address"
+              error={emailError}
+              value={email}
+              onChangeText={t => { setEmail(t); if (emailError) setEmailError(''); }}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+
+            {/* Password */}
+            <FormField
+              label="Password — min 6 characters"
+              error={passwordError}
+              value={password}
+              onChangeText={t => { setPassword(t); if (passwordError) setPasswordError(''); }}
+              secureTextEntry
+            />
+
+            {/* Confirm password */}
+            <FormField
+              label="Confirm password"
+              error={confirmError}
+              value={confirm}
+              onChangeText={t => { setConfirm(t); if (confirmError) setConfirmError(''); }}
+              secureTextEntry
+            />
+
+            {/* Create account CTA */}
             <TouchableOpacity
-              style={[styles.signUpBtn, isLoading && styles.btnDisabled]}
+              style={[s.primaryBtn, isLoading && s.primaryBtnDisabled]}
               onPress={handleSignUp}
               disabled={isLoading}
+              activeOpacity={0.8}
             >
-              {isLoading
-                ? <ActivityIndicator color={Colors.white} />
-                : <Text style={styles.signUpBtnText}>Create Account →</Text>
-              }
+              <LinearGradient
+                colors={[Colors.gold, Colors.goldLight]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={s.primaryBtnGradient}
+              >
+                {isLoading
+                  ? <ActivityIndicator color={Colors.white} />
+                  : <Text style={s.primaryBtnText}>Create Account  ✦</Text>
+                }
+              </LinearGradient>
             </TouchableOpacity>
 
-            <View style={styles.loginRow}>
-              <Text style={styles.loginText}>Already have an account? </Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                <Text style={styles.loginLink}>Sign In</Text>
+            {/* Sign in link */}
+            <View style={s.switchRow}>
+              <Text style={s.switchText}>Already a member?  </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Login')} activeOpacity={0.7}>
+                <Text style={s.switchLink}>Sign In</Text>
               </TouchableOpacity>
             </View>
-          </View>
+
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+// ─── Styles ───────────────────────────────────────────────────────
+const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.cream },
   scroll:    { flexGrow: 1 },
 
-  header: { backgroundColor: Colors.tealDark, padding: Spacing.xl, paddingTop: 50, alignItems: 'center', gap: Spacing.xs },
-  backBtn:     { position: 'absolute', top: 50, left: Spacing.base, width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
-  backBtnText: { fontSize: Typography.sizes.xl, color: 'rgba(255,255,255,0.7)' },
-  headerFlame: { fontSize: 32 },
-  headerTitle: { fontFamily: Typography.heading, fontSize: Typography.sizes['3xl'], color: Colors.white },
-  headerSub:   { fontSize: Typography.sizes.xs, color: Colors.goldLight, textAlign: 'center', lineHeight: 18, fontFamily: Typography.body },
+  // ── Header ─────────────────────────────────────────────────────
+  header: {
+    alignItems: 'center',
+    paddingTop: 48,
+    paddingBottom: 32,
+    paddingHorizontal: Spacing['2xl'],
+    overflow: 'hidden',
+  },
 
-  form: { flex: 1, padding: Spacing.xl, gap: Spacing.md },
+  // Back button
+  backBtn: {
+    position: 'absolute',
+    top: 48, left: Spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 2,
+  },
+  backArrow: {
+    fontSize: Typography.sizes.xl,
+    color: Colors.teal,
+    lineHeight: 24,
+  },
+  backText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.teal,
+    fontFamily: Typography.body,
+    letterSpacing: 0.3,
+  },
 
-  errorBox: { backgroundColor: 'rgba(224,92,92,0.1)', borderRadius: Radius.md, padding: Spacing.md, borderWidth: 1, borderColor: 'rgba(224,92,92,0.3)' },
-  errorText: { fontSize: Typography.sizes.xs, color: Colors.error, fontFamily: Typography.body },
+  // Logo
+  iconRing: {
+    width: 68, height: 68, borderRadius: 34,
+    borderWidth: 1.5,
+    borderColor: 'rgba(212,147,58,0.5)',
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(212,147,58,0.05)',
+    marginBottom: Spacing.md,
+    ...Shadows.gold,
+  },
+  icon: { width: 50, height: 50, resizeMode: 'contain' },
 
-  googleBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.white, borderRadius: Radius.lg, padding: Spacing.md, gap: Spacing.md, borderWidth: 1, borderColor: Colors.border, ...Shadows.sm },
-  googleIcon: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#EA4335', alignItems: 'center', justifyContent: 'center' },
-  googleIconText: { color: Colors.white, fontFamily: Typography.bodySemiBold, fontSize: Typography.sizes.md },
-  googleBtnText: { fontFamily: Typography.bodySemiBold, fontSize: Typography.sizes.md, color: Colors.textPrimary },
+  // Headline
+  headline: {
+    fontFamily: Typography.heading,
+    fontSize: 46,
+    color: Colors.tealDark,
+    letterSpacing: 0.5,
+    lineHeight: 52,
+    textAlign: 'center',
+  },
 
-  divider: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  dividerLine: { flex: 1, height: 1, backgroundColor: Colors.border },
-  dividerText: { fontSize: Typography.sizes.xs, color: Colors.textMuted, fontFamily: Typography.body },
+  // Ornamental divider
+  ornamentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    width: '65%',
+    marginVertical: Spacing.sm,
+  },
+  ornamentLine:  { flex: 1, height: 1, backgroundColor: 'rgba(212,147,58,0.28)' },
+  ornamentGlyph: { fontSize: 9, color: Colors.gold },
 
-  input: { backgroundColor: Colors.white, borderRadius: Radius.md, padding: Spacing.md, fontSize: Typography.sizes.md, color: Colors.textPrimary, fontFamily: Typography.body, borderWidth: 1, borderColor: Colors.border },
+  subHeadline: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textMuted,
+    fontFamily: Typography.body,
+    letterSpacing: 0.3,
+  },
 
-  signUpBtn: { backgroundColor: Colors.gold, borderRadius: Radius.lg, padding: Spacing.md, alignItems: 'center', ...Shadows.gold },
-  btnDisabled: { opacity: 0.6 },
-  signUpBtnText: { fontFamily: Typography.bodySemiBold, fontSize: Typography.sizes.md, color: Colors.white },
+  // ── Form ───────────────────────────────────────────────────────
+  form: {
+    paddingHorizontal: Spacing.xl,
+    paddingBottom: Spacing['3xl'],
+    gap: Spacing.lg,
+  },
 
-  loginRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  loginText: { fontSize: Typography.sizes.sm, color: Colors.textMuted, fontFamily: Typography.body },
-  loginLink: { fontSize: Typography.sizes.sm, color: Colors.teal, fontFamily: Typography.bodySemiBold },
+  // Error
+  errorBox: {
+    backgroundColor: 'rgba(224,92,92,0.08)',
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(224,92,92,0.25)',
+  },
+  errorText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.error,
+    fontFamily: Typography.body,
+    letterSpacing: 0.3,
+  },
+
+  // Google button
+  googleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.md + 2,
+    paddingHorizontal: Spacing.base,
+    gap: Spacing.sm,
+    borderWidth: 1.5,
+    borderColor: 'rgba(27,107,107,0.18)',
+    ...Shadows.sm,
+  },
+  googleLogoRing: {
+    width: 22, height: 22, borderRadius: 11,
+    backgroundColor: '#EA4335',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  googleG: {
+    color: Colors.white,
+    fontFamily: Typography.bodySemiBold,
+    fontSize: 12,
+  },
+  googleBtnText: {
+    fontFamily: Typography.bodySemiBold,
+    fontSize: Typography.sizes.md,
+    color: Colors.textPrimary,
+  },
+
+  // Primary CTA
+  primaryBtn: {
+    borderRadius: Radius.xl,
+    overflow: 'hidden',
+    ...Shadows.gold,
+    marginTop: Spacing.xs,
+  },
+  primaryBtnDisabled: { opacity: 0.6 },
+  primaryBtnGradient: {
+    paddingVertical: Spacing.md + 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primaryBtnText: {
+    fontFamily: Typography.bodySemiBold,
+    fontSize: Typography.sizes.base,
+    color: Colors.white,
+    letterSpacing: 0.5,
+  },
+
+  // Switch row
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  switchText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textMuted,
+    fontFamily: Typography.body,
+  },
+  switchLink: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.teal,
+    fontFamily: Typography.bodySemiBold,
+  },
 });

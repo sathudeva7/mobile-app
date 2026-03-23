@@ -10,6 +10,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -20,6 +21,7 @@ export default function OnboardingScreen({ navigation }) {
     <LinearGradient colors={Gradients.teal} style={styles.container}>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <View style={styles.content}>
+          <Image source={require('../../../assets/icon.png')} style={styles.logo} />
           <Text style={styles.emoji}>🌿</Text>
           <Text style={styles.title}>Discover Your Nature</Text>
           <Text style={styles.subtitle}>
@@ -54,6 +56,12 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: Spacing.xl,
     alignItems: 'center',
+  },
+  logo: {
+    width:        56,
+    height:       56,
+    resizeMode:   'contain',
+    marginBottom: Spacing.md,
   },
   emoji: { fontSize: 64, marginBottom: Spacing.lg },
   title: {
