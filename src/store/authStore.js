@@ -15,6 +15,9 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Crypto from 'expo-crypto';
+import { OAuthProvider } from 'firebase/auth';
 import {
   doc,
   getDoc,
@@ -166,6 +169,53 @@ const useAuthStore = create((set, get) => ({
     }
   },
 
+  // ─── Sign in with Apple ───────────────────────────────────────────
+  signInWithApple: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      // Generate a random nonce and its SHA256 hash
+      const rawNonce = Array.from(
+        await Crypto.getRandomBytesAsync(32),
+        b => b.toString(16).padStart(2, '0')
+      ).join('');
+      const hashedNonce = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        rawNonce
+      );
+
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+        nonce: hashedNonce,
+      });
+
+      const provider = new OAuthProvider('apple.com');
+      const oauthCredential = provider.credential({
+        idToken: credential.identityToken,
+        rawNonce,
+      });
+
+      const result = await signInWithCredential(auth, oauthCredential);
+
+      // Apple only sends fullName on the very first sign-in — save it immediately
+      const fullName = credential.fullName;
+      const displayName = fullName
+        ? [fullName.givenName, fullName.familyName].filter(Boolean).join(' ')
+        : result.user.displayName || '';
+
+      await get().ensureUserProfile({ ...result.user, displayName });
+      set({ isLoading: false });
+    } catch (e) {
+      if (e.code === 'ERR_REQUEST_CANCELED') {
+        set({ isLoading: false });
+        return;
+      }
+      set({ isLoading: false, error: 'Apple Sign-In failed. Please try again.' });
+    }
+  },
+
   // ─── Sign in with email/password ─────────────────────────────────
   signInWithEmail: async (email, password) => {
     set({ isLoading: true, error: null });
@@ -257,7 +307,7 @@ const useAuthStore = create((set, get) => ({
     const ref  = doc(db, COLLECTIONS.USERS, firebaseUser.uid);
     const snap = await getDoc(ref);
     if (!snap.exists()) {
-      await get().createUserProfile(firebaseUser, {});
+      await get().createUserProfile(firebaseUser, { displayName: firebaseUser.displayName });
     } else {
       set({ user: { uid: firebaseUser.uid, ...snap.data() } });
     }

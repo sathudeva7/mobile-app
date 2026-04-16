@@ -30,22 +30,9 @@ export const googleSignIn = {
   androidClientId: get('GOOGLE_ANDROID_CLIENT_ID'),
 };
 
-export const openai = {
-  apiKey: get('OPENAI_API_KEY'),
-  model:  get('OPENAI_MODEL', 'gpt-4o'),
-};
-
 export const agora = {
   appId:          get('AGORA_APP_ID'),
   adminPortalUrl: get('ADMIN_PORTAL_URL', ''),
-};
-
-export const pinecone = {
-  apiKey:    get('PINECONE_API_KEY'),
-  // Host without protocol, e.g. rivnitz-rag-xxx.svc.aped-xxx.pinecone.io
-  // Find it in Pinecone Console → your index → copy host
-  host:      get('PINECONE_HOST'),
-  indexName: get('PINECONE_INDEX_NAME', 'rivnitz-rag'),
 };
 
 export const expo = {
@@ -63,10 +50,6 @@ export const hasFirebaseConfig = () => {
   return key.length > 20 && !key.includes('DEMO_FOR_DEV');
 };
 
-export const hasOpenAIConfig = () => !!openai.apiKey;
-
 export const hasGoogleSignInConfig = () => !!googleSignIn.webClientId;
 
-export const hasPineconeConfig = () => !!(pinecone.apiKey && pinecone.host);
-
-export default { firebase, googleSignIn, openai, expo };
+export default { firebase, googleSignIn, expo };

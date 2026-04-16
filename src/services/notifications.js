@@ -115,9 +115,11 @@ export function setupNotificationListeners(navigationRef) {
 
   // User tapped a notification
   const responseSub = Notifications.addNotificationResponseReceivedListener(response => {
-    const screen = response.notification.request.content.data?.screen;
+    const data   = response.notification.request.content.data ?? {};
+    const screen = data.screen;
     if (screen && navigationRef?.current) {
-      navigationRef.current.navigate(screen);
+      const params = data.videoId ? { videoId: data.videoId } : undefined;
+      navigationRef.current.navigate(screen, params);
     }
   });
 

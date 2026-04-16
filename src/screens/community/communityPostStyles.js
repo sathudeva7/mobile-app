@@ -1,0 +1,192 @@
+import { StyleSheet } from 'react-native';
+import { Colors, Typography, Spacing, Radius, Shadows } from '../../theme';
+
+export default StyleSheet.create({
+  pinnedCard: {
+    flexDirection: 'row',
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(27,107,107,0.15)',
+    ...Shadows.sm,
+  },
+  pinnedAccent: {
+    width: 3,
+    backgroundColor: Colors.teal,
+  },
+  pinnedInner: {
+    flex: 1,
+    padding: Spacing.md,
+    gap: 6,
+  },
+  pinnedBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  pinnedBadge: {
+    backgroundColor: Colors.tealPale,
+    borderRadius: Radius.sm,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+  },
+  pinnedBadgeText: {
+    fontSize: 8,
+    color: Colors.teal,
+    fontFamily: Typography.bodySemiBold,
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+  },
+  pinnedMeta: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textMuted,
+    fontFamily: Typography.body,
+  },
+  pinnedText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textPrimary,
+    lineHeight: 22,
+    fontFamily: Typography.body,
+    fontStyle: 'italic',
+  },
+  pinnedAuthor: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.teal,
+    fontFamily: Typography.bodySemiBold,
+    letterSpacing: 0.3,
+  },
+
+  postCard: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(212,147,58,0.1)',
+    ...Shadows.sm,
+    gap: Spacing.sm,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  avatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    flexShrink: 0,
+  },
+  avatarText: {
+    fontSize: Typography.sizes.xs,
+    fontFamily: Typography.bodySemiBold,
+  },
+  postMeta: { flex: 1, gap: 2 },
+  postAuthor: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.tealDark,
+    fontFamily: Typography.heading,
+    letterSpacing: 0.2,
+  },
+  postTime: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textMuted,
+    fontFamily: Typography.body,
+  },
+  deleteBtn: { padding: 6 },
+  deleteBtnText: { fontSize: 12, color: Colors.textMuted },
+
+  postContent: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textPrimary,
+    lineHeight: 22,
+    fontFamily: Typography.body,
+  },
+
+  postActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    paddingTop: Spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(212,147,58,0.1)',
+  },
+  actionBtn: {},
+  actionPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: Radius.xl,
+    backgroundColor: Colors.cream,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  actionPillLiked: {
+    backgroundColor: Colors.goldPale,
+    borderColor: 'rgba(212,147,58,0.3)',
+  },
+  actionHeart: { fontSize: 13, color: Colors.textMuted },
+  actionHeartLiked: { color: Colors.gold },
+  actionReplyIcon: { fontSize: 12, color: Colors.textMuted },
+  actionCount: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textMuted,
+    fontFamily: Typography.bodyMedium,
+  },
+  actionCountLiked: { color: Colors.gold },
+
+  replyRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    alignItems: 'flex-start',
+  },
+  replyAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    flexShrink: 0,
+    marginTop: 2,
+  },
+  replyAvatarText: {
+    fontSize: 10,
+    fontFamily: Typography.bodySemiBold,
+  },
+  replyBubble: {
+    flex: 1,
+    backgroundColor: Colors.white,
+    borderRadius: Radius.md,
+    padding: Spacing.sm + 2,
+    borderWidth: 1,
+    borderColor: 'rgba(212,147,58,0.1)',
+    gap: 4,
+  },
+  replyBubbleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  replyAuthor: {
+    fontFamily: Typography.heading,
+    fontSize: Typography.sizes.xs,
+    color: Colors.tealDark,
+    letterSpacing: 0.2,
+  },
+  replyTime: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textMuted,
+    fontFamily: Typography.body,
+  },
+  replyContent: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textPrimary,
+    lineHeight: 20,
+    fontFamily: Typography.body,
+  },
+});

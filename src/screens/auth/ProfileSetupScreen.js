@@ -113,7 +113,7 @@ export default function ProfileSetupScreen({ navigation }) {
             />
           </View>
         </View>
-
+  
         {/* Prayer Info */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>For Prayers 🙏</Text>

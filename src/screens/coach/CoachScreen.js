@@ -105,6 +105,10 @@ export default function CoachScreen({ navigation }) {
   const [showHeaderMenu,   setShowHeaderMenu]   = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [reportFeedback,   setReportFeedback]   = useState(false);
+  const [showReportModal,  setShowReportModal]  = useState(false);
+  const [reportQuality,    setReportQuality]    = useState(null);
+  const [reportComments,   setReportComments]   = useState('');
+  const [reportTargetMsg,  setReportTargetMsg]  = useState(null);
 
   const flatListRef    = useRef(null);
   const typewriterRef  = useRef(null);
@@ -132,24 +136,51 @@ export default function CoachScreen({ navigation }) {
     setSelectedMsg(null);
   };
 
-  // ── Report ──────────────────────────────────────────────────────
-  const handleReport = async () => {
+  // ── Report — open rich feedback modal ──────────────────────────
+  const getPrecedingQuestion = (msgId) => {
+    const idx = messages.findIndex(m => m.id === msgId);
+    for (let i = idx - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') return messages[i].content;
+    }
+    return '';
+  };
+
+  const openReportModal = (msg) => {
+    setReportTargetMsg(msg);
+    setReportQuality(null);
+    setReportComments('');
+    setShowReportModal(true);
+    setShowActionMenu(false);
+    setSelectedMsg(null);
+  };
+
+  const handleReport = () => {
     if (!selectedMsg) return;
-    closeActionMenu();
+    openReportModal(selectedMsg);
+  };
+
+  const submitFeedback = async () => {
+    if (!reportTargetMsg || !reportQuality) return;
+    const userQuestion = getPrecedingQuestion(reportTargetMsg.id);
+    setShowReportModal(false);
     try {
       await addDoc(collection(db, 'reported_messages'), {
-        messageContent: selectedMsg.content,
-        messageRole:    selectedMsg.role,
-        reportedBy:     user?.uid ?? null,
-        reporterName:   user?.displayName ?? null,
-        reporterEmail:  user?.email ?? null,
-        createdAt:      serverTimestamp(),
-        status:         'pending',
+        userQuestion,
+        aiResponse:         reportTargetMsg.content,
+        responseQuality:    reportQuality,
+        additionalComments: reportComments.trim(),
+        reportedBy:         user?.uid ?? null,
+        reporterName:       user?.displayName ?? null,
+        reporterEmail:      user?.email ?? null,
+        createdAt:          serverTimestamp(),
+        status:             'pending',
       });
       setReportFeedback(true);
       setTimeout(() => setReportFeedback(false), 2500);
-    } catch {
-      // Silent fail
+    } catch (e) {
+      console.error('submitFeedback error:', e);
+      setReportFeedback(true); // still close gracefully
+      setTimeout(() => setReportFeedback(false), 2500);
     }
   };
 
@@ -224,11 +255,10 @@ export default function CoachScreen({ navigation }) {
         .then(() => fetchUserProfile(user.uid))
         .catch(() => {});
     } catch (error) {
-      const content = error?.message?.includes('not configured')
-        ? error.message
-        : 'I\'m having trouble connecting right now. Please try again in a moment.';
+      const errMsg = error?.message || JSON.stringify(error) || String(error);
+      alert('AI Coach Error: ' + errMsg);
       setMessages(prev => [...prev, {
-        id: aiMsgId, role: 'assistant', content, timestamp: new Date(), isError: true,
+        id: aiMsgId, role: 'assistant', content: errMsg, timestamp: new Date(), isError: true,
       }]);
     } finally {
       setIsTyping(false);
@@ -242,33 +272,44 @@ export default function CoachScreen({ navigation }) {
     return (
       <View style={[s.msgRow, isUser ? s.msgRowUser : s.msgRowAI]}>
         {!isUser && <CoachAvatar />}
-        <TouchableOpacity
-          activeOpacity={0.88}
-          onLongPress={() => handleLongPress(item)}
-          delayLongPress={400}
-        >
-          {isUser ? (
-            <LinearGradient
-              colors={[Colors.gold, '#C47A25']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[s.bubble, s.bubbleUser, item.isError && s.bubbleError]}
+        <View style={s.msgBubbleCol}>
+          <TouchableOpacity
+            activeOpacity={0.88}
+            onLongPress={() => handleLongPress(item)}
+            delayLongPress={400}
+          >
+            {isUser ? (
+              <LinearGradient
+                colors={[Colors.gold, '#C47A25']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[s.bubble, s.bubbleUser, item.isError && s.bubbleError]}
+              >
+                <Text style={[s.bubbleText, s.bubbleTextUser]}>{item.content}</Text>
+              </LinearGradient>
+            ) : (
+              <View style={[s.bubble, s.bubbleAI, item.isError && s.bubbleError]}>
+                <Text style={[s.bubbleText, s.bubbleTextAI]}>{item.content}</Text>
+                {item.escalated && (
+                  <View style={s.escalatedBadge}>
+                    <Text style={s.escalatedText}>
+                      ✦  Sent to Rabbi Landau for personal guidance
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+          </TouchableOpacity>
+          {!isUser && !item.isError && item.id !== 'welcome' && (
+            <TouchableOpacity
+              style={s.reportIssueBtn}
+              onPress={() => openReportModal(item)}
+              activeOpacity={0.6}
             >
-              <Text style={[s.bubbleText, s.bubbleTextUser]}>{item.content}</Text>
-            </LinearGradient>
-          ) : (
-            <View style={[s.bubble, s.bubbleAI, item.isError && s.bubbleError]}>
-              <Text style={[s.bubbleText, s.bubbleTextAI]}>{item.content}</Text>
-              {item.escalated && (
-                <View style={s.escalatedBadge}>
-                  <Text style={s.escalatedText}>
-                    ✦  Sent to Rabbi Landau for personal guidance
-                  </Text>
-                </View>
-              )}
-            </View>
+              <Text style={s.reportIssueBtnText}>🚩  Report issue</Text>
+            </TouchableOpacity>
           )}
-        </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -424,6 +465,97 @@ export default function CoachScreen({ navigation }) {
               <Text style={s.cancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
+        </Pressable>
+      </Modal>
+
+      {/* ── Share Feedback modal ────────────────────────────────────── */}
+      <Modal visible={showReportModal} transparent animationType="fade" onRequestClose={() => setShowReportModal(false)}>
+        <Pressable style={s.overlayCenter} onPress={() => setShowReportModal(false)}>
+          <Pressable style={s.feedbackCard} onPress={() => {}}>
+            {/* Header */}
+            <View style={s.feedbackHeader}>
+              <View style={s.feedbackTitleRow}>
+                <Text style={s.feedbackFlagIcon}>🚩</Text>
+                <Text style={s.feedbackTitle}>Share Feedback</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowReportModal(false)} hitSlop={8} activeOpacity={0.7}>
+                <Text style={s.feedbackCloseIcon}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* QUESTION */}
+            <Text style={s.feedbackLabel}>QUESTION</Text>
+            <View style={s.feedbackReadBox}>
+              <Text style={s.feedbackReadText} numberOfLines={2}>
+                {reportTargetMsg ? getPrecedingQuestion(reportTargetMsg.id) || '—' : '—'}
+              </Text>
+            </View>
+
+            {/* ANSWER */}
+            <Text style={s.feedbackLabel}>ANSWER</Text>
+            <View style={[s.feedbackReadBox, s.feedbackAnswerBox]}>
+              <Text style={s.feedbackReadText} numberOfLines={4}>
+                {reportTargetMsg?.content ?? ''}
+              </Text>
+            </View>
+
+            {/* RESPONSE QUALITY */}
+            <Text style={[s.feedbackLabel, { marginTop: Spacing.md }]}>
+              RESPONSE QUALITY <Text style={{ color: Colors.error }}>*</Text>
+            </Text>
+            <View style={s.qualityRow}>
+              {[
+                { key: 'poor', emoji: '😟', label: 'Poor' },
+                { key: 'ok',   emoji: '😐', label: 'Ok'   },
+                { key: 'good', emoji: '😊', label: 'Good' },
+              ].map(({ key, emoji, label }) => (
+                <TouchableOpacity
+                  key={key}
+                  style={[s.qualityBtn, reportQuality === key && s.qualityBtnSelected]}
+                  onPress={() => setReportQuality(key)}
+                  activeOpacity={0.75}
+                >
+                  <Text style={s.qualityEmoji}>{emoji}</Text>
+                  <Text style={[s.qualityLabel, reportQuality === key && s.qualityLabelSelected]}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* ADDITIONAL COMMENTS */}
+            <Text style={s.feedbackLabel}>ADDITIONAL COMMENTS</Text>
+            <TextInput
+              style={s.feedbackCommentsInput}
+              placeholder="What could be improved?"
+              placeholderTextColor={Colors.textMuted}
+              value={reportComments}
+              onChangeText={setReportComments}
+              multiline
+              numberOfLines={3}
+              maxLength={500}
+              textAlignVertical="top"
+            />
+
+            {/* Submit */}
+            <TouchableOpacity
+              style={[s.feedbackSubmitBtn, !reportQuality && s.feedbackSubmitBtnDisabled]}
+              onPress={submitFeedback}
+              disabled={!reportQuality}
+              activeOpacity={0.85}
+            >
+              <LinearGradient
+                colors={reportQuality ? [Colors.gold, '#C47A25'] : [Colors.creamDark, Colors.creamDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={s.feedbackSubmitGradient}
+              >
+                <Text style={[s.feedbackSubmitText, !reportQuality && s.feedbackSubmitTextDisabled]}>
+                  Submit Feedback
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </Pressable>
         </Pressable>
       </Modal>
 
@@ -852,5 +984,143 @@ const s = StyleSheet.create({
     fontFamily: Typography.bodySemiBold,
     fontSize: Typography.sizes.sm,
     color: Colors.white,
+  },
+
+  // ── Message bubble column (bubble + report button stacked) ─────
+  msgBubbleCol: {
+    flexShrink: 1,
+  },
+
+  // ── Inline report issue button ─────────────────────────────────
+  reportIssueBtn: {
+    marginTop: 5,
+    paddingLeft: 2,
+  },
+  reportIssueBtnText: {
+    fontSize: 11,
+    color: Colors.textMuted,
+    fontFamily: Typography.body,
+  },
+
+  // ── Share Feedback modal card ──────────────────────────────────
+  feedbackCard: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius['2xl'],
+    padding: Spacing.xl,
+    gap: Spacing.sm,
+    ...Shadows.lg,
+  },
+  feedbackHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.xs,
+  },
+  feedbackTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  feedbackFlagIcon: { fontSize: 16 },
+  feedbackTitle: {
+    fontFamily: Typography.heading,
+    fontSize: Typography.sizes['2xl'],
+    color: Colors.tealDark,
+    lineHeight: 28,
+  },
+  feedbackCloseIcon: {
+    fontSize: 16,
+    color: Colors.textMuted,
+    fontFamily: Typography.bodyMedium,
+  },
+  feedbackLabel: {
+    fontSize: 10,
+    color: Colors.textMuted,
+    fontFamily: Typography.bodySemiBold,
+    letterSpacing: 1.2,
+    marginTop: Spacing.xs,
+    marginBottom: 4,
+  },
+  feedbackReadBox: {
+    backgroundColor: Colors.cream,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+  },
+  feedbackAnswerBox: {
+    minHeight: 80,
+  },
+  feedbackReadText: {
+    fontSize: Typography.sizes.sm,
+    color: Colors.textPrimary,
+    fontFamily: Typography.body,
+    lineHeight: 20,
+  },
+
+  // Quality selector
+  qualityRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginBottom: Spacing.xs,
+  },
+  qualityBtn: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: Spacing.md,
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    backgroundColor: Colors.cream,
+    gap: 4,
+  },
+  qualityBtnSelected: {
+    borderColor: Colors.gold,
+    backgroundColor: Colors.goldPale,
+  },
+  qualityEmoji: { fontSize: 22 },
+  qualityLabel: {
+    fontSize: Typography.sizes.xs,
+    color: Colors.textMuted,
+    fontFamily: Typography.bodyMedium,
+  },
+  qualityLabelSelected: {
+    color: Colors.gold,
+  },
+
+  // Comments input
+  feedbackCommentsInput: {
+    backgroundColor: Colors.cream,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+    fontSize: Typography.sizes.sm,
+    color: Colors.textPrimary,
+    fontFamily: Typography.body,
+    minHeight: 72,
+    textAlignVertical: 'top',
+  },
+
+  // Submit button
+  feedbackSubmitBtn: {
+    borderRadius: Radius.lg,
+    overflow: 'hidden',
+    marginTop: Spacing.xs,
+  },
+  feedbackSubmitBtnDisabled: { opacity: 0.6 },
+  feedbackSubmitGradient: {
+    paddingVertical: Spacing.md + 2,
+    alignItems: 'center',
+  },
+  feedbackSubmitText: {
+    fontFamily: Typography.bodySemiBold,
+    fontSize: Typography.sizes.md,
+    color: Colors.white,
+  },
+  feedbackSubmitTextDisabled: {
+    color: Colors.textMuted,
   },
 });

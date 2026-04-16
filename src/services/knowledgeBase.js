@@ -231,7 +231,7 @@ export async function saveAIBehaviorSettings(settings) {
 // Called when admin uploads a transcript in the sync tab
 export async function extractTeachingsFromTranscript({ videoId, videoTitle, transcript, openai }) {
   const response = await openai.chat.completions.create({
-    model: 'gpt-4-turbo-preview',
+    model: 'gpt-4o',
     messages: [
       {
         role: 'system',

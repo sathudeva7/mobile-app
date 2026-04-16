@@ -13,20 +13,41 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
 import YoutubePlayer from 'react-native-youtube-iframe';
 import { Colors, Typography, Spacing, Radius, Shadows } from '../../theme';
-import { trackVideoView, getMuxPlaybackUrl } from '../../services/videoService';
+import { trackVideoView, getMuxPlaybackUrl, fetchVideo } from '../../services/videoService';
 import { useAuthStore } from '../../store/authStore';
 
 const { width } = Dimensions.get('window');
 
 export default function VideoPlayerScreen({ route, navigation }) {
-  const { video }        = route.params;
+  const { video: videoParam, videoId } = route.params;
   const { user }         = useAuthStore();
   const videoRef         = useRef(null);
+  const [video, setVideo] = useState(videoParam ?? null);
   const [status, setStatus] = useState({});
   const [loading, setLoading] = useState(true);
   const [embedBlocked, setEmbedBlocked] = useState(false);
-  const [viewCount, setViewCount] = useState(video.viewCount || 0);
+  const [viewCount, setViewCount] = useState(videoParam?.viewCount || 0);
   const viewTracked      = useRef(false);
+
+  // When opened from a notification we only have videoId — fetch the full doc
+  useEffect(() => {
+    if (!videoParam && videoId) {
+      fetchVideo(videoId).then(v => {
+        if (v) {
+          setVideo(v);
+          setViewCount(v.viewCount || 0);
+        }
+      });
+    }
+  }, []);
+
+  if (!video) {
+    return (
+      <View style={{ flex: 1, backgroundColor: Colors.cream, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color={Colors.gold} />
+      </View>
+    );
+  }
 
   const isYoutube   = video.videoType === 'youtube';
   const playbackUrl = isYoutube

@@ -219,11 +219,11 @@ export default function AIAssessmentScreen({ navigation, route }) {
           return prev;
         });
       }
-    } catch {
+    } catch (error) {
       setMessages(prev => [...prev, {
         id: nextId(),
         role: 'assistant',
-        content: 'I\'m having trouble connecting right now. Please try again in a moment.',
+        content: error,
       }]);
     } finally {
       setIsTyping(false);
@@ -296,14 +296,20 @@ export default function AIAssessmentScreen({ navigation, route }) {
           <Text style={[s.star, { top: 14, right: 80, fontSize: 6,  opacity: 0.20 }]}>✦</Text>
           <Text style={[s.star, { top: 38, right: 62, fontSize: 4,  opacity: 0.12 }]}>✦</Text>
 
+          <View style={s.navBar}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn} activeOpacity={0.6}>
+              <Text style={s.backBtnText}>←</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleSkip} style={s.skipBtn} activeOpacity={0.6}>
+              <Text style={s.skipText}>SKIP</Text>
+            </TouchableOpacity>
+          </View>
+
           <View style={s.headerRow}>
             <View style={s.headerLeft}>
               <Text style={s.headerEyebrow}>SACRED JOURNEY  ·  STEP 2 OF 4</Text>
               <Text style={s.headerTitle}>Soul{'\n'}Reading</Text>
             </View>
-            <TouchableOpacity onPress={handleSkip} style={s.skipBtn} activeOpacity={0.6}>
-              <Text style={s.skipText}>SKIP</Text>
-            </TouchableOpacity>
           </View>
 
           <StageProgress activeStage={activeStage} />
@@ -392,20 +398,34 @@ const s = StyleSheet.create({
   // ── Header ────────────────────────────────────────────────────
   header: {
     paddingHorizontal: Spacing.lg,
-    paddingTop:        Spacing.base,
+    paddingTop:        Spacing.sm,
     paddingBottom:     Spacing.lg,
     overflow:          'hidden',
+  },
+  navBar: {
+    flexDirection:  'row',
+    alignItems:     'center',
+    justifyContent: 'space-between',
+    marginBottom:   Spacing.sm,
+  },
+  backBtn: {
+    paddingVertical:   Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    borderWidth:       1,
+    borderColor:       'rgba(255,255,255,0.1)',
+    borderRadius:      Radius.full,
+  },
+  backBtnText: {
+    fontSize:   18,
+    color:      'rgba(255,255,255,0.6)',
+    lineHeight: 20,
   },
   star: {
     position: 'absolute',
     color: Colors.gold,
   },
-  headerRow: {
-    flexDirection:  'row',
-    alignItems:     'flex-start',
-    justifyContent: 'space-between',
-  },
-  headerLeft:  { flex: 1 },
+  headerRow: {},
+  headerLeft:  {},
   headerEyebrow: {
     fontSize:      Typography.sizes.xs,
     color:         'rgba(212,147,58,0.55)',

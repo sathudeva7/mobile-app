@@ -19,18 +19,14 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.rivnitz.app",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "usesAppleSignIn": true,
       "buildNumber": "1",
       "infoPlist": {
+        "GIDClientID": "469986977960-m9o38hrvmusavmcaiip2lv0om0agf8h0.apps.googleusercontent.com",
         "NSCameraUsageDescription": "Rivnitz uses your camera for face reading during the nature discovery quiz.",
         "NSPhotoLibraryUsageDescription": "Rivnitz accesses your photos for profile picture and face reading.",
-        "NSMicrophoneUsageDescription": "Rivnitz uses your microphone during live Rabbi sessions.",
-        "CFBundleURLTypes": [
-          {
-            "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.469986977960-m9o38hrvmusavmcaiip2lv0om0agf8h0"
-            ]
-          }
-        ]
+        "NSMicrophoneUsageDescription": "Rivnitz uses your microphone during live Rabbi sessions."
       }
     },
     "android": {

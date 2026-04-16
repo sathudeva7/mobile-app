@@ -185,6 +185,25 @@ service cloud.firestore {
       allow delete: if isPortalAdmin() || isAdmin();
     }
 
+    // ─── Dedicated Videos ──────────────────────────────────────────
+    match /dedicated_videos/{docId} {
+      allow read:   if isAdmin() || isPortalAdmin() || (
+        isLoggedIn() && resource.data.userId == request.auth.uid
+      );
+      allow create: if isLoggedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin() || isPortalAdmin();
+      allow delete: if isAdmin() || isPortalAdmin();
+    }
+
+    // ─── Reported Messages ─────────────────────────────────────────
+    // Logged-in users can submit reports; only admins can read/update/delete.
+    match /reported_messages/{reportId} {
+      allow create: if isLoggedIn();
+      allow read:   if isPortalAdmin() || isAdmin();
+      allow update: if isPortalAdmin() || isAdmin();
+      allow delete: if isPortalAdmin() || isAdmin();
+    }
+
     // ─── RAG Documents ─────────────────────────────────────────────
     // Metadata about uploaded documents (title, status, chunkCount, topics).
     // The DocumentsTab in the admin portal reads this via onSnapshot (client SDK).
