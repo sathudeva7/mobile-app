@@ -79,8 +79,8 @@ android/
 ios/
 
 # Firebase service config (contains project keys)
-google-services.json
-GoogleService-Info.plist
+# google-services.json
+# GoogleService-Info.plist
 
 # Claude Code
 .claude/
