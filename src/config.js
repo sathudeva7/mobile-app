@@ -25,8 +25,8 @@ export const firebase = {
 };
 
 export const googleSignIn = {
-  webClientId:    get('GOOGLE_WEB_CLIENT_ID'),
-  iosClientId:   get('GOOGLE_IOS_CLIENT_ID'),
+  webClientId:    get('GOOGLE_WEB_CLIENT_ID', '469986977960-fb40gkklo58nk8p7shpslb0j2od3a85a.apps.googleusercontent.com'),
+  iosClientId:   get('GOOGLE_IOS_CLIENT_ID', '469986977960-m9o38hrvmusavmcaiip2lv0om0agf8h0.apps.googleusercontent.com'),
   androidClientId: get('GOOGLE_ANDROID_CLIENT_ID'),
 };
 
