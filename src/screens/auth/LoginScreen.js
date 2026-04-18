@@ -32,6 +32,13 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [isAppleAvailable, setIsAppleAvailable] = useState(false);
+
+  React.useEffect(() => {
+    if (Platform.OS === 'ios') {
+      AppleAuthentication.isAvailableAsync().then(setIsAppleAvailable).catch(() => {});
+    }
+  }, []);
 
   const { signInWithGoogle, signInWithApple, signInWithEmail, isLoading, error, clearError } =
     useAuthStore();
@@ -59,7 +66,7 @@ export default function LoginScreen({ navigation }) {
   };
 
   const showGoogle = isGoogleSignInAvailable;
-  const showApple = Platform.OS === 'ios';
+  const showApple = isAppleAvailable;
 
   return (
     <SafeAreaView style={s.container} edges={['bottom']}>

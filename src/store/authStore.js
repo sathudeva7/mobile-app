@@ -5,6 +5,7 @@
 
 import { create } from 'zustand';
 import { Platform } from 'react-native';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -14,7 +15,6 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged,
 } from 'firebase/auth';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Crypto from 'expo-crypto';
 import { OAuthProvider } from 'firebase/auth';
@@ -148,7 +148,6 @@ const useAuthStore = create((set, get) => ({
   signInWithGoogle: async () => {
     set({ isLoading: true, error: null });
     try {
-      // hasPlayServices is Android-only — skip on iOS
       if (Platform.OS !== 'ios') {
         await GoogleSignin.hasPlayServices();
       }
@@ -160,11 +159,11 @@ const useAuthStore = create((set, get) => ({
       await get().ensureUserProfile(result.user);
       set({ isLoading: false });
     } catch (e) {
-      // User cancelled — don't show an error
       if (e?.code === statusCodes.SIGN_IN_CANCELLED) {
         set({ isLoading: false });
         return;
       }
+      console.error('[signInWithGoogle] code:', e?.code, 'message:', e?.message, e);
       set({ isLoading: false, error: friendlyAuthError(e) });
     }
   },
@@ -174,6 +173,7 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       // Generate a random nonce and its SHA256 hash
+      console.log('signInWithApple');
       const rawNonce = Array.from(
         await Crypto.getRandomBytesAsync(32),
         b => b.toString(16).padStart(2, '0')
@@ -208,10 +208,12 @@ const useAuthStore = create((set, get) => ({
       await get().ensureUserProfile({ ...result.user, displayName });
       set({ isLoading: false });
     } catch (e) {
-      if (e.code === 'ERR_REQUEST_CANCELED') {
+      console.log('signInWithApple error:', e);
+      if (e.code === 'ERR_REQUEST_CANCELED' || e.code === 'ERR_REQUEST_UNKNOWN') {
         set({ isLoading: false });
         return;
       }
+      console.error('[signInWithApple] error code:', e?.code, 'message:', e?.message, e);
       set({ isLoading: false, error: 'Apple Sign-In failed. Please try again.' });
     }
   },
